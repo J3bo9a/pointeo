@@ -2,6 +2,8 @@ name: Build APK
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -16,3 +18,13 @@ jobs:
         with:
           name: Pointeo-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish APK
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk Pointeo.apk
+          gh release delete latest -y --cleanup-tag || true
+          gh release create latest Pointeo.apk --title "Pointeo APK" --notes "Debug build"
+          git config user.name github-actions; git config user.email actions@github.com
+          git checkout --orphan apk; git rm -rf . -q; git add -f Pointeo.apk
+          git commit -qm "apk"; git push -f origin apk
+        env:
+          GH_TOKEN: ${{ github.token }}

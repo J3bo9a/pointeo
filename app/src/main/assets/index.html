@@ -141,6 +141,7 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
 #zoom img{display:block;background:#fff;transform-origin:center center}
 #sigv{position:fixed;inset:0;z-index:950;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom));gap:.8rem;overflow:auto}
 #sigv h1{margin:0}
+#ob{position:fixed;inset:0;z-index:960;background:var(--bg);color:var(--ink);overflow:auto;padding:max(1rem,env(safe-area-inset-top)) 1rem 2rem}#ob .in{max-width:30rem;margin:0 auto}#ob h1{margin:.5rem 0 .2rem}#ob .row{display:flex;gap:.6rem;margin-top:1.2rem}#ob .row .b{flex:1}
 #sigw{position:relative;background:#fff;border:2px solid var(--ink);border-radius:14px;height:min(46vh,300px);min-height:180px;flex:none}
 #sigw::after{content:'';position:absolute;left:6%;right:6%;bottom:22%;border-bottom:2px dashed #b8b8b8;pointer-events:none}
 #sigpad{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
@@ -190,11 +191,12 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
         <h2 data-i18n="sec.worker"></h2>
         <span class="sglab" id="civ-l" style="margin-top:0" data-i18n="f.civ"></span>
         <div class="seg" id="civ" role="group" aria-labelledby="civ-l"><button type="button" data-v="Monsieur" data-i18n="civ.mr"></button><button type="button" data-v="Madame" data-i18n="civ.mrs"></button></div>
-        <label for="empno" data-i18n="f.empno"></label><input id="empno" maxlength="20" autocomplete="off">
         <label for="name" data-i18n="f.name"></label><input id="name" maxlength="60" autocomplete="name">
         <label for="addr1" data-i18n="f.addr"></label><input id="addr1" maxlength="60" autocomplete="off">
         <label for="addr2" data-i18n="f.zip"></label><input id="addr2" maxlength="60" autocomplete="off">
+        <label for="phone" data-i18n="f.phone"></label><input id="phone" type="tel" inputmode="tel" maxlength="30" autocomplete="tel">
         <label for="advisor" data-i18n="f.advisor"></label><input id="advisor" maxlength="60" autocomplete="off">
+        <label for="advphone" data-i18n="f.advphone"></label><input id="advphone" type="tel" inputmode="tel" maxlength="30" autocomplete="off">
       </section>
       <section>
         <h2 data-i18n="sec.client"></h2>
@@ -202,6 +204,7 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
         <label for="cliA" data-i18n="f.addr"></label><input id="cliA" maxlength="60" autocomplete="off">
         <label for="cliL" data-i18n="f.zip"></label><input id="cliL" maxlength="60" autocomplete="off">
         <label for="contact" data-i18n="f.contact"></label><input id="contact" maxlength="60" autocomplete="off">
+        <label for="ctel" data-i18n="f.ctel"></label><input id="ctel" type="tel" inputmode="tel" maxlength="30" autocomplete="off">
         <label for="contract" data-i18n="f.site"></label><input id="contract" maxlength="60" autocomplete="off">
       </section>
     </div>
@@ -235,6 +238,7 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
   <main id="v-reglages" hidden>
     <h1 data-i18n="set.title"></h1>
     <ul class="list">
+      <li><button class="rb" type="button" id="profbtn"><span data-i18n="set.profile"></span><span class="chev" aria-hidden="true">›</span></button></li>
       <li><button class="rb" type="button" data-go="historique"><span data-i18n="set.history"></span><span class="chev" aria-hidden="true">›</span></button></li>
       <li class="it"><span data-i18n="set.dark"></span><label class="sw" style="margin:0"><input type="checkbox" id="dark" role="switch" data-i18n-al="set.dark"><span class="trk"></span></label></li>
       <li class="it col"><span id="lang-l" data-i18n="set.lang"></span>
@@ -254,6 +258,13 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
   <div id="msg" role="status"></div>
   <div class="bt"><button class="b p wide" type="button" id="exp" data-i18n="exp.go"></button></div>
 </div>
+<div id="ob" hidden role="dialog" aria-modal="true" aria-labelledby="obt"><div class="in"><h1 id="obt" tabindex="-1" data-i18n="ob.title"></h1><p class="mu" style="margin:0 0 1rem" data-i18n="ob.sub"></p>
+<span class="sglab" id="obciv-l" data-i18n="f.civ"></span><div class="seg" id="obciv" role="group" aria-labelledby="obciv-l"><button type="button" data-v="Monsieur" data-i18n="civ.mr"></button><button type="button" data-v="Madame" data-i18n="civ.mrs"></button></div>
+<label for="obname" data-i18n="f.name"></label><input id="obname" maxlength="60" autocomplete="name">
+<label for="obaddr" data-i18n="f.addr"></label><input id="obaddr" maxlength="60" autocomplete="street-address">
+<label for="obzip" data-i18n="f.zip"></label><input id="obzip" maxlength="60" autocomplete="off">
+<label for="obtel" data-i18n="f.phone"></label><input id="obtel" type="tel" inputmode="tel" maxlength="30" autocomplete="tel">
+<div class="row"><button type="button" class="b" id="obcancel" data-i18n="ob.cancel" hidden></button><button type="button" class="b p" id="obok" data-i18n="ob.ok" disabled></button></div></div></div>
 <div id="sigv" hidden role="dialog" aria-modal="true" aria-labelledby="sigt"><h1 id="sigt" tabindex="-1" data-i18n="sig.title"></h1><p class="mu" style="margin:0" data-i18n="sig.hint"></p><div id="sigw"><canvas id="sigpad" aria-label="Signature"></canvas></div><div class="row"><button type="button" class="b" id="sigclr" data-i18n="sig.clear"></button><button type="button" class="b p" id="sigok" data-i18n="sig.ok" disabled></button></div><button type="button" class="b" id="sigskip" data-i18n="sig.skip"></button></div>
 <div id="zoom" hidden role="dialog" aria-modal="true"><button type="button" id="zx" data-i18n-al="prev.close">×</button><img id="zimg" alt=""></div>
 <img id="print-img" alt="">
@@ -271,7 +282,8 @@ const SH={circle:c=>'<circle cx="60" cy="60" r="44" fill="'+c+'"/>',square:c=>'<
 const LY={triangle:[92,32],half:[80,34]};
 const mk=(n,c,s)=>{const[w,...r]=n.split(' '),l=LY[s]||[74,40];return svg(SH[s](c)+'<text x="60" y="'+l[0]+'" text-anchor="middle" '+T+' font-size="'+l[1]+'" font-weight="700" fill="#fff">'+w[0]+'</text><text x="126" y="58" '+T+' font-size="38" font-weight="700" fill="'+c+'">'+w+'</text>'+(r.length?'<text x="128" y="92" '+T+' font-size="24" fill="#4b5563">'+r.join(' ')+'</text>':''))};
 const AGD=[['Nordia Intérim','#1d4ed8','circle'],['Solstice Staff','#c2410c','half'],['Pivot RH','#15803d','square'],['Alterna Emploi','#7c3aed','circle'],['Atlas Travail Temporaire','#0e7490','hex'],['Brigade Intérim','#b91c1c','diamond'],['Chantier Express','#a16207','square'],['Delta Missions','#4338ca','triangle'],['Équilibre RH','#0f766e','circle'],['Fabrik Intérim','#475569','hex'],['Garance Emploi','#be123c','half'],['Horizon BTP Intérim','#1e40af','diamond'],['Ivoire Staff','#78716c','circle'],['Jalons RH','#047857','triangle'],['Kéops Intérim','#9a3412','square'],['Lumen Emploi','#ca8a04','half'],['Méridien Staff','#6d28d9','hex'],['Nautilus Intérim','#0369a1','circle'],['Orion Travail','#334155','diamond'],['Prisme RH','#c026d3','triangle']];
-const AG=AGD.map(([n,c,s])=>({id:nz(n).replace(/[^a-z0-9]+/g,'-'),name:n,svg:mk(n,c,s)})).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+const CITIES=['Lausanne','Genève','Fribourg','Neuchâtel','Sion','Yverdon-les-Bains','Vevey','Nyon','Morges','Bulle'];
+const AG=AGD.map(([n,c,s],i)=>({id:nz(n).replace(/[^a-z0-9]+/g,'-'),name:n,svg:mk(n,c,s),city:CITIES[(i*3)%CITIES.length],fax:'+41 21 555 '+String(10+(i*7)%90).padStart(2,'0')+' '+String(10+(i*13)%90).padStart(2,'0')})).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
 const url=a=>a.u||(a.u='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(a.svg));
 const agOf=id=>AG.find(a=>a.id===id);
 
@@ -300,6 +312,12 @@ de:{'st.infos':'Angaben','st.prev':'Vorschau','prev.hint':'Tippen Sie auf den St
 es:{'st.infos':'Datos','st.prev':'Vista previa','prev.hint':'Toca la hoja para ampliarla.','prev.close':'Cerrar','wk.prev':'Semana anterior','wk.next':'Semana siguiente','val.hours':'Formato no reconocido (p. ej. 8:15, máx. 24 h).','exp.go':'Exportar','exp.empty':'Introduce al menos un día antes de exportar.','sh.format':'Formato','sh.to':'Destinatario (correo)','sh.msg':'Mensaje','sh.via':'Compartir con','sh.note2':'Solo «Todas las apps» adjunta el archivo. Las demás aplicaciones se abren con el mensaje rellenado.','sh.fallback':'Compartir archivos no es compatible aquí. El archivo se ha guardado.','sh.opened':'Abierto: {app}','tile.all':'Todas las apps','tile.mail':'Correo','tile.save':'Guardar','tile.print':'Imprimir','his.share':'Compartir','home.all':'Todas','home.saved':'Guardadas','nav.agencies':'Agencias','nav.settings':'Ajustes','nav.share':'Compartir','home.title':'Agencias','home.sub':'Elige tu agencia para abrir su hoja de horas.','home.search':'Buscar una agencia','home.n':'{n} agencias','home.r1':'1 resultado','home.rN':'{n} resultados','home.none':'No se encontró ninguna agencia.','save.add':'Guardar {name}','save.rm':'Quitar {name}','sheet.change':'Cambiar de agencia','sec.worker':'Colaborador','f.civ':'Tratamiento','civ.mr':'Señor','civ.mrs':'Señora','f.empno':'N.º de colaborador','f.name':'Nombre y apellidos','f.addr':'Dirección','f.zip':'Código postal y localidad','f.advisor':'Asesor (agencia)','sec.client':'Cliente','f.cli':'Empresa cliente','f.contact':'Contacto (jefe de obra)','f.site':'Obra (lugar predeterminado)','sec.week':'Semana','f.start':'Primer día','d.hours':'Horas','d.total':'Total de la semana','act.copy':'Copiar el lunes a lun–vie','x.ot':'Horas extra %','x.ts':'Trabajo suplementario %','x.site':'Obra (si es distinta)','x.trip':'Plus de desplazamiento (€)','x.meal':'Comida (€)','x.more':'Más opciones','fail':'No se pudo crear el archivo.','sh.title':'Compartir','sh.empty':'Exporta una hoja para compartirla aquí.','sh.shared':'Compartido.','sh.cancel':'Compartir cancelado.','sh.saved':'Guardado: {f}','sh.declined':'Guardado cancelado.','set.title':'Ajustes','set.history':'Historial','set.dark':'Modo oscuro','set.lang':'Idioma','set.langnote':'Solo cambia el idioma de la interfaz, no el de la hoja.','home.nosaved':'Aún no hay agencias guardadas. Toca el marcador de una agencia para añadirla aquí.','his.empty':'Aún no has exportado ninguna hoja. Aparecerán aquí después de exportar.','his.week':'Semana {w}','his.exp':'Exportada el {d} en {k}','his.tot':'Total: {h}','his.open':'Abrir','his.del':'Eliminar'},
 it:{'st.infos':'Dati','st.prev':'Anteprima','prev.hint':'Tocca il foglio per ingrandirlo.','prev.close':'Chiudi','wk.prev':'Settimana precedente','wk.next':'Settimana successiva','val.hours':'Formato non riconosciuto (es. 8:15, max 24 h).','exp.go':'Esporta','exp.empty':'Inserisci almeno un giorno prima di esportare.','sh.format':'Formato','sh.to':'Destinatario (e-mail)','sh.msg':'Messaggio','sh.via':'Condividi tramite','sh.note2':'Solo «Tutte le app» allega il file. Le altre app si aprono con il messaggio precompilato.','sh.fallback':'La condivisione di file non è supportata qui. Il file è stato salvato.','sh.opened':'Aperto: {app}','tile.all':'Tutte le app','tile.mail':'E-mail','tile.save':'Salva','tile.print':'Stampa','his.share':'Condividi','home.all':'Tutte','home.saved':'Salvate','nav.agencies':'Agenzie','nav.settings':'Impostazioni','nav.share':'Condividi','home.title':'Agenzie','home.sub':'Scegli la tua agenzia per aprire il suo foglio ore.','home.search':'Cerca un’agenzia','home.n':'{n} agenzie','home.r1':'1 risultato','home.rN':'{n} risultati','home.none':'Nessuna agenzia trovata.','save.add':'Salva {name}','save.rm':'Rimuovi {name}','sheet.change':'Cambia agenzia','sec.worker':'Collaboratore','f.civ':'Titolo','civ.mr':'Signor','civ.mrs':'Signora','f.empno':'N. collaboratore','f.name':'Nome e cognome','f.addr':'Indirizzo','f.zip':'CAP e località','f.advisor':'Consulente (agenzia)','sec.client':'Cliente','f.cli':'Azienda cliente','f.contact':'Contatto (capocantiere)','f.site':'Cantiere (luogo predefinito)','sec.week':'Settimana','f.start':'Primo giorno','d.hours':'Ore','d.total':'Totale della settimana','act.copy':'Copia il lunedì su lun–ven','x.ot':'Ore straordinarie %','x.ts':'Lavoro supplementare %','x.site':'Cantiere (se diverso)','x.trip':'Indennità di trasferta (€)','x.meal':'Pasto (€)','x.more':'Altre opzioni','fail':'Impossibile creare il file.','sh.title':'Condividi','sh.empty':'Esporta un foglio per condividerlo qui.','sh.shared':'Condiviso.','sh.cancel':'Condivisione annullata.','sh.saved':'Salvato: {f}','sh.declined':'Salvataggio annullato.','set.title':'Impostazioni','set.history':'Cronologia','set.dark':'Modalità scura','set.lang':'Lingua','set.langnote':'Cambia solo la lingua dell’interfaccia, non quella del foglio.','home.nosaved':'Nessuna agenzia salvata. Tocca il segnalibro di un’agenzia per aggiungerla qui.','his.empty':'Nessun foglio esportato finora. Appariranno qui dopo l’esportazione.','his.week':'Settimana {w}','his.exp':'Esportata il {d} in {k}','his.tot':'Totale: {h}','his.open':'Apri','his.del':'Elimina'}
 };
+Object.assign(I.fr,{'f.phone':'Téléphone','f.advphone':'Téléphone du conseiller','f.ctel':'Téléphone du contact','ob.title':'Vos informations','ob.sub':'Saisies une seule fois, elles seront reprises automatiquement sur chaque feuille.','ob.ok':'Continuer','ob.cancel':'Annuler','set.profile':'Mes informations'});
+Object.assign(I.en,{'f.phone':'Phone','f.advphone':'Advisor phone','f.ctel':'Contact phone','ob.title':'Your details','ob.sub':'Entered once, they will be filled in automatically on every timesheet.','ob.ok':'Continue','ob.cancel':'Cancel','set.profile':'My details'});
+Object.assign(I.pt,{'f.phone':'Telefone','f.advphone':'Telefone do consultor','f.ctel':'Telefone do contacto','ob.title':'Os seus dados','ob.sub':'Preenchidos uma só vez, serão usados automaticamente em todas as folhas.','ob.ok':'Continuar','ob.cancel':'Cancelar','set.profile':'Os meus dados'});
+Object.assign(I.de,{'f.phone':'Telefon','f.advphone':'Telefon des Beraters','f.ctel':'Telefon des Kontakts','ob.title':'Ihre Angaben','ob.sub':'Einmal eingeben, dann werden sie automatisch in jeden Stundenzettel übernommen.','ob.ok':'Weiter','ob.cancel':'Abbrechen','set.profile':'Meine Angaben'});
+Object.assign(I.es,{'f.phone':'Teléfono','f.advphone':'Teléfono del asesor','f.ctel':'Teléfono del contacto','ob.title':'Tus datos','ob.sub':'Se introducen una sola vez y se rellenan automáticamente en cada hoja.','ob.ok':'Continuar','ob.cancel':'Cancelar','set.profile':'Mis datos'});
+Object.assign(I.it,{'f.phone':'Telefono','f.advphone':'Telefono del consulente','f.ctel':'Telefono del contatto','ob.title':'I tuoi dati','ob.sub':'Inseriti una sola volta, verranno compilati automaticamente in ogni foglio.','ob.ok':'Continua','ob.cancel':'Annulla','set.profile':'I miei dati'});
 Object.assign(I.fr,{'sig.title':'Signature','sig.hint':'Signez dans le cadre avec le doigt.','sig.clear':'Effacer','sig.skip':'Passer (nom seul)','sig.ok':'Valider'});
 Object.assign(I.en,{'sig.title':'Signature','sig.hint':'Sign in the box with your finger.','sig.clear':'Clear','sig.skip':'Skip (name only)','sig.ok':'Confirm'});
 Object.assign(I.pt,{'sig.title':'Assinatura','sig.hint':'Assine na caixa com o dedo.','sig.clear':'Limpar','sig.skip':'Saltar (só o nome)','sig.ok':'Confirmar'});
@@ -322,7 +340,7 @@ const ld=(s,o)=>parse(s).toLocaleDateString(LOC[LANG],o);
 /* ---------- état de la feuille ---------- */
 const DECL_CLIENT='Par sa signature le client ou son représentant reconnaît les heures effectuées par notre collaborateur ainsi que les frais notés. Cette signature vaut d’acceptation du contrat de location de service relatif à cette mission. Le présent document signé vaut titre à la mainlevée au sens de l’art. 82 LP.';
 const DECL_WORKER='Le collaborateur confirme par sa signature sur ce rapport d’heures, que les différences par rapport au temps de travail convenu ne sont que le fait de sa volonté explicite et déclare par la présente être d’accord avec le fait, que seules lui seront payées les heures qui ont été effectuées et qui sont confirmées par la signature du client apposée sur ce rapport. Seuls les frais notés seront indemnisés.';
-const FIELDS=['name','civ','empno','addr1','addr2','advisor','cli','cliA','cliL','contact','contract'];
+const FIELDS=['name','civ','addr1','addr2','phone','advisor','advphone','cli','cliA','cliL','contact','ctel','contract'];
 let S={agency:'',start:monday(),rows:Array.from({length:7},()=>norm({})),wk:{}};FIELDS.forEach(k=>S[k]='');
 try{const o=JSON.parse(localStorage.getItem('feuille-heures-v2')||'null');if(o){const rows=o.rows;delete o.rows;if(o.client&&!o.contact)o.contact=o.client;delete o.client;Object.assign(S,o);if(rows&&rows.length===7)S.rows=rows.map(norm)}}catch(e){}
 S.wk=S.wk||{};
@@ -351,22 +369,25 @@ function draw(){
       if((ls.length*lh<=h&&ok)||s===min){const top=o.top?y:y+(h-ls.length*lh)/2;ls.forEach((l,i)=>c.fillText(l,left?x:x+w/2,top+i*lh+s*0.92));return}}};
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#fff';c.fillRect(0,0,1754,1240);
   const k=0.788;c.setTransform(k,0,0,k,50-145*k,10);c.textBaseline='alphabetic';
+  const lab=(l,v)=>{v=String(v||'').trim();return v?l+': '+v:''};
   const L=logo();
+  const agx=agOf(S.agency);if(agx){one(lab('Ville',agx.city),176,333,500,30);one(lab('Fax',agx.fax),176,373,500,30)}
   if(L){const r=Math.min(600/L.naturalWidth,250/L.naturalHeight);c.drawImage(L,150,95,L.naturalWidth*r,L.naturalHeight*r)}
-  c.fillStyle=B;c.fillRect(145,408,60,322);c.fillRect(778,65,50,665);
-  c.strokeStyle=LN;c.lineWidth=2.5;line(145,408,1398,408);line(1398,65,1398,730);
-  one('Client:',848,110,300,30,LB);one(S.cli,868,255,500,34);one(S.cliA,868,298,500,34);one(S.cliL,868,342,500,34);
-  one('Contact:',848,453,300,30,LB);one(S.contact,868,535,500,34);
+  c.fillStyle=B;c.fillRect(145,408,60,182);c.fillRect(778,65,50,525);
+  c.strokeStyle=LN;c.lineWidth=2.5;line(145,408,1398,408);line(1398,65,1398,590);
+  one('Client:',848,110,300,30,LB);one(lab('Entreprise',S.cli),868,255,500,34);one(lab('Adresse',S.cliA),868,298,500,34);one(lab('NPA et localité',S.cliL),868,342,500,34);
+  one('Contact:',848,453,300,30,LB);one(lab('Nom',S.contact),868,505,500,34);one(lab('Tél',S.ctel),868,555,500,32);
   const d0=parse(S.start);
-  one('Mois de:',226,453,150,30,LB);one(d0.getFullYear()+' '+(d0.getMonth()+1),400,453,350,32);one(S.empno,400,500,350,32);
-  one('Conseiller',226,710,160,30,LB);one(S.advisor,400,700,350,32);
-  [S.civ,S.name,S.addr1,S.addr2].forEach((s0,i)=>one(s0,1470,492+i*46.5,740,32));
-  const X=[145,363,570,778,985,1192,1399,1606,1812,2021,2243],Y=[733,813,885,957,1029,1101,1173,1245,1317];
+  one('Mois de:',226,453,150,30,LB);one(d0.getFullYear()+'/'+(d0.getMonth()+1),400,453,350,32);
+  one('Conseiller:',226,510,170,30,LB);one(S.advisor,400,500,350,32);one(lab('Tél',S.advphone),226,567,500,30);
+  [lab('Civilité',S.civ),lab('Nom et prénom',S.name),lab('Adresse',S.addr1),lab('NPA et localité',S.addr2),lab('Tél',S.phone)].forEach((s0,i)=>one(s0,1470,424+i*34,740,30));
+  c.translate(0,-143);
+  const X=[145,363,570,778,985,1192,1399,1606,1812,2021,2243],Y=[733,813,885,957,1029,1101,1173,1245,1389];
   c.fillStyle=HD;c.fillRect(145,733,2098,80);
-  c.strokeStyle=LN;c.lineWidth=2;Y.forEach(y=>line(145,y,2243,y));X.forEach(x=>line(x,733,x,1317));
+  c.strokeStyle=LN;c.lineWidth=2;Y.forEach(y=>line(145,y,2243,y));X.forEach(x=>line(x,733,x,1389));
   ['Semaine','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche','Total:','Frais:'].forEach((h,i)=>one(h,X[i]+20,784,X[i+1]-X[i]-30,30,LB));
   one('N°',178,860,40,26,LB);one(String(isoWeek(S.start)),218,856,100,34);
-  [['Heures',885],['Heures sup %',957],['Travail sup %',1029],['Chantier',1101],['Ind. déplacement',1173],['Panier',1245]].forEach(([s0,y])=>one(s0,176,y+46,175,30,LB));
+  [['Heures',885,0],['Heures sup %',957,0],['Travail sup %',1029,0],['Ind. déplacement',1101,0],['Panier',1173,0],['Chantier',1245,36]].forEach(([s0,y,o])=>one(s0,176,y+46+o,175,30,LB));
   let tot=0,sd=0,sr=0,nd=0,nr=0;
   for(let d=0;d<7;d++){
     const x=X[d+1],w=X[d+2]-x,dt=parse(addDays(S.start,d)),r=S.rows[d],m=mins(r),ad=parseAmt(r.dp),ar=parseAmt(r.rp);
@@ -375,32 +396,27 @@ function draw(){
     box(m!==null?fmtS(m):r.w,x+8,889,w-16,64,{bold:true,max:42,min:20});
     box(r.ot,x+8,961,w-16,64,{max:32,min:14});
     box(r.ts,x+8,1033,w-16,64,{max:32,min:14});
-    box(r.c||(m!==null?S.contract:''),x+8,1105,w-16,64,{max:30,min:13});
-    box(ad!==null?fmtAmt(ad):r.dp,x+8,1177,w-16,64,{max:30,min:14});
-    box(ar!==null?fmtAmt(ar):r.rp,x+8,1249,w-16,64,{max:30,min:14});
+    box(ad!==null?fmtAmt(ad):r.dp,x+8,1105,w-16,64,{max:30,min:14});
+    box(ar!==null?fmtAmt(ar):r.rp,x+8,1177,w-16,64,{max:30,min:14});
+    box(r.c||(m!==null?S.contract:''),x+8,1249,w-16,136,{max:60,min:13});
   }
   const tw=X[9]-X[8]-16;
   if(tot>0)box(fmtS(tot),X[8]+8,889,tw,64,{bold:true,max:42,min:20});
-  if(nd)box(fmtAmt(sd),X[8]+8,1177,tw,64,{bold:true,max:30,min:16});
-  if(nr)box(fmtAmt(sr),X[8]+8,1249,tw,64,{bold:true,max:30,min:16});
+  if(nd)box(fmtAmt(sd),X[8]+8,1105,tw,64,{bold:true,max:30,min:16});
+  if(nr)box(fmtAmt(sr),X[8]+8,1177,tw,64,{bold:true,max:30,min:16});
   if(nd||nr)box(fmtAmt(sd+sr),X[9]+8,889,X[10]-X[9]-16,64,{bold:true,max:36,min:18});
-  one('Signature client:',176,1362,380,30,LB);
-  box(DECL_CLIENT,590,1335,585,135,{align:'left',top:true,max:24,min:12,color:LB,lh:1.25});
-  one('Signature intérimaire:',1213,1362,400,30,LB);
-  box(DECL_WORKER,1626,1335,590,150,{align:'left',top:true,max:24,min:12,color:LB,lh:1.25});
-  c.strokeStyle=LN;c.lineWidth=2;c.setLineDash([3,7]);line(176,1475,560,1475);line(1213,1475,1600,1475);c.setLineDash([]);
-  if(S.sigmode==='draw'&&SIGIMG){const bw=380,bh=92,k=Math.min(bw/SIGIMG.width,bh/SIGIMG.height),w=SIGIMG.width*k,h=SIGIMG.height*k;c.drawImage(SIGIMG,1213+(bw-w)/2,1468-h,w,h)}
-  else if(S.sigmode==='name'&&S.name){let z=46;c.fillStyle=TX;c.textAlign='left';c.font='italic 400 '+z+'px '+FONT;while(z>20&&c.measureText(S.name).width>380){z-=2;c.font='italic 400 '+z+'px '+FONT}c.fillText(S.name,1213,1462)}
-  const ag=agOf(S.agency);
-  one('Original = '+(ag?ag.name:''),176,1518,520,30,LB);one('Copie jaune = Employé',1062,1518,450,30,LB);
-  c.textAlign='right';c.fillStyle=LB;f('400',30);c.fillText('Copie rose = Client',2200,1518);
-  c.textAlign='left';c.fillStyle='#8793a0';f('400',18);c.fillText(FOOTER,176,1542);
+  c.translate(0,72);
+  one('Signature client:',176,1362,500,30,LB);
+  box(DECL_CLIENT,1300,1345,943,200,{align:'left',top:true,max:28,min:12,color:LB,lh:1.25});
+  c.strokeStyle=LN;c.lineWidth=2;c.setLineDash([3,7]);line(176,1545,1230,1545);c.setLineDash([]);
+  if(S.sigmode==='draw'&&SIGIMG){const bw=1030,bh=150,k=Math.min(bw/SIGIMG.width,bh/SIGIMG.height),w=SIGIMG.width*k,h=SIGIMG.height*k;c.drawImage(SIGIMG,176+(bw-w)/2,1540-h,w,h)}
+  else if(S.sigmode==='name'){const nm=String(S.contact||S.cli||'').trim();if(nm){let z=56;c.fillStyle=TX;c.textAlign='left';c.font='italic 400 '+z+'px '+FONT;while(z>20&&c.measureText(nm).width>1030){z-=2;c.font='italic 400 '+z+'px '+FONT}c.fillText(nm,176,1532)}}
   return tot;
 }
 
 /* ---------- formulaire de la semaine ---------- */
 $('#days').innerHTML=S.rows.map((r,i)=>'<div class="day" data-i="'+i+'"><div class="row"><span class="d"></span>'
- +'<input data-k="w" maxlength="10" placeholder="8:15" data-i18n-al="d.hours">'
+ +'<input data-k="w" maxlength="10" data-i18n-al="d.hours">'
  +'<button type="button" class="more" aria-expanded="false" data-i18n-al="x.more">+</button></div>'
  +'<p class="err" role="alert" hidden data-i18n="val.hours"></p>'
  +'<div class="extra" hidden>'
@@ -632,7 +648,7 @@ document.addEventListener('click',e=>{
   const d=el.dataset;
   if(d.go)return go(d.go);
   if(d.save)return toggleSave(d.save);
-  if(d.open){S.agency=d.open;save();setST(S.name?'semaine':'infos');update();return go('feuille')}
+  if(d.open){S.agency=d.open;applyProfile(false);save();setST(S.cli?'semaine':'infos');update();return go('feuille')}
   if(d.hopen){const x=H.find(h=>h.id===d.hopen);if(!x)return;loadSnap(x.snap);fillInputs();setST('semaine');update();return go('feuille')}
   if(d.hshare)return reexport(d.hshare);
   if(d.hdel){H=H.filter(h=>h.id!==d.hdel);saveH();renderHistory();return}
@@ -656,6 +672,22 @@ function applyLang(){
 const syncLang=()=>document.querySelectorAll('#lang button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===LANG)));
 $('#lang').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LANG=b.dataset.lang;try{localStorage.setItem('fh-lang',LANG)}catch(x){}syncLang();applyLang()});
 
+/* ---------- profil (première ouverture) ---------- */
+let P={};try{P=JSON.parse(localStorage.getItem('fh-profile')||'{}')||{}}catch(e){}
+const PK=['civ','name','addr1','addr2','phone'];
+const hasP=()=>!!(P.name&&P.addr1&&P.addr2&&P.phone);
+function applyProfile(force){PK.forEach(k=>{if(P[k]&&(force||!S[k]))S[k]=P[k]});fillInputs();update()}
+let obCiv='';
+const obV=()=>({name:$('#obname').value.trim(),addr1:$('#obaddr').value.trim(),addr2:$('#obzip').value.trim(),phone:$('#obtel').value.trim()});
+const obCheck=()=>{const v=obV();$('#obok').disabled=!(v.name&&v.addr1&&v.addr2&&v.phone)};
+const obSync=()=>document.querySelectorAll('#obciv button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===obCiv)));
+function openOb(first){obCiv=P.civ||'';$('#obname').value=P.name||'';$('#obaddr').value=P.addr1||'';$('#obzip').value=P.addr2||'';$('#obtel').value=P.phone||'';obSync();obCheck();$('#obcancel').hidden=!!first;$('#ob').hidden=false;$('#obt').focus()}
+['obname','obaddr','obzip','obtel'].forEach(i=>$('#'+i).addEventListener('input',obCheck));
+$('#obciv').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;obCiv=obCiv===b.dataset.v?'':b.dataset.v;obSync()});
+$('#obok').addEventListener('click',()=>{P=Object.assign({civ:obCiv},obV());try{localStorage.setItem('fh-profile',JSON.stringify(P))}catch(e){}$('#ob').hidden=true;applyProfile(true)});
+$('#obcancel').addEventListener('click',()=>{$('#ob').hidden=true});
+$('#profbtn').addEventListener('click',()=>openOb(false));
+
 /* ---------- navigation ---------- */
 const V=['accueil','feuille','partage','reglages','historique'];
 const TAB={accueil:'accueil',feuille:'accueil',partage:'partage',reglages:'reglages',historique:'reglages'};
@@ -673,7 +705,7 @@ function go(v){if(location.hash==='#'+v)route();else location.hash=v}
 addEventListener('hashchange',route);
 
 /* ---------- démarrage ---------- */
-syncLang();fillInputs();syncTheme();setST(S.name?'semaine':'infos');applyLang();route();
+syncLang();fillInputs();syncTheme();setST(S.cli?'semaine':'infos');applyLang();route();if(!hasP())openOb(true);
 if(document.documentElement.classList.contains('splash'))setTimeout(()=>document.documentElement.classList.remove('splash'),2000);
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>

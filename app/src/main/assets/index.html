@@ -141,6 +141,7 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
 #zoom img{display:block;background:#fff;transform-origin:center center}
 #sigv{position:fixed;inset:0;z-index:950;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom));gap:.8rem;overflow:auto}
 #sigv h1{margin:0}
+.opn{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin:.8rem 0 .2rem}.opn .b{min-height:2.75rem}
 #ob{position:fixed;inset:0;z-index:960;background:var(--bg);color:var(--ink);overflow:auto;padding:max(1rem,env(safe-area-inset-top)) 1rem 2rem}#ob .in{max-width:30rem;margin:0 auto}#ob h1{margin:.5rem 0 .2rem}#ob .row{display:flex;gap:.6rem;margin-top:1.2rem}#ob .row .b{flex:1}
 #sigw{position:relative;background:#fff;border:2px solid var(--ink);border-radius:14px;height:min(46vh,300px);min-height:180px;flex:none}
 #sigw::after{content:'';position:absolute;left:6%;right:6%;bottom:22%;border-bottom:2px dashed #b8b8b8;pointer-events:none}
@@ -173,6 +174,7 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
     <h1 data-i18n="home.title"></h1>
     <p class="mu" style="margin:0 0 1rem" data-i18n="home.sub"></p>
     <input type="search" id="q" data-i18n-ph="home.search" data-i18n-al="home.search" autocomplete="off">
+    <div class="opn"><button type="button" class="b" id="opbtn" data-i18n="open.btn"></button><input type="file" id="opfile" accept="application/pdf,image/jpeg,.pdf,.jpg,.jpeg" hidden><span class="mu small" id="opmsg" role="status"></span></div>
     <div class="seg" id="hf" role="group" style="margin-top:.7rem"><button type="button" data-hf="all" data-i18n="home.all"></button><button type="button" data-hf="saved" data-i18n="home.saved"></button></div>
     <div class="cnt" id="cnt"></div>
     <div class="cards" id="list"></div>
@@ -318,6 +320,12 @@ Object.assign(I.pt,{'f.phone':'Telefone','f.advphone':'Telefone do consultor','f
 Object.assign(I.de,{'f.phone':'Telefon','f.advphone':'Telefon des Beraters','f.ctel':'Telefon des Kontakts','ob.title':'Ihre Angaben','ob.sub':'Einmal eingeben, dann werden sie automatisch in jeden Stundenzettel übernommen.','ob.ok':'Weiter','ob.cancel':'Abbrechen','set.profile':'Meine Angaben'});
 Object.assign(I.es,{'f.phone':'Teléfono','f.advphone':'Teléfono del asesor','f.ctel':'Teléfono del contacto','ob.title':'Tus datos','ob.sub':'Se introducen una sola vez y se rellenan automáticamente en cada hoja.','ob.ok':'Continuar','ob.cancel':'Cancelar','set.profile':'Mis datos'});
 Object.assign(I.it,{'f.phone':'Telefono','f.advphone':'Telefono del consulente','f.ctel':'Telefono del contatto','ob.title':'I tuoi dati','ob.sub':'Inseriti una sola volta, verranno compilati automaticamente in ogni foglio.','ob.ok':'Continua','ob.cancel':'Annulla','set.profile':'I miei dati'});
+Object.assign(I.fr,{'open.btn':'Ouvrir une feuille (PDF ou JPEG)','open.none':'Ce fichier ne vient pas de Pointeo ou ses données ont été supprimées (par exemple par WhatsApp). Envoyez la feuille en PDF ou comme document.','open.type':'Ouvrez un fichier PDF ou JPEG.'});
+Object.assign(I.en,{'open.btn':'Open a timesheet (PDF or JPEG)','open.none':'This file is not from Pointeo, or its data was removed (for example by WhatsApp). Send the sheet as a PDF or as a document.','open.type':'Open a PDF or JPEG file.'});
+Object.assign(I.pt,{'open.btn':'Abrir uma folha (PDF ou JPEG)','open.none':'Este ficheiro não é do Pointeo ou os dados foram removidos (por exemplo pelo WhatsApp). Envie a folha em PDF ou como documento.','open.type':'Abra um ficheiro PDF ou JPEG.'});
+Object.assign(I.de,{'open.btn':'Stundenzettel öffnen (PDF oder JPEG)','open.none':'Diese Datei stammt nicht von Pointeo oder die Daten wurden entfernt (zum Beispiel durch WhatsApp). Senden Sie den Stundenzettel als PDF oder als Dokument.','open.type':'Öffnen Sie eine PDF- oder JPEG-Datei.'});
+Object.assign(I.es,{'open.btn':'Abrir una hoja (PDF o JPEG)','open.none':'Este archivo no es de Pointeo o sus datos se han eliminado (por ejemplo, por WhatsApp). Envía la hoja como PDF o como documento.','open.type':'Abre un archivo PDF o JPEG.'});
+Object.assign(I.it,{'open.btn':'Apri un foglio (PDF o JPEG)','open.none':'Questo file non proviene da Pointeo o i suoi dati sono stati rimossi (ad esempio da WhatsApp). Invia il foglio come PDF o come documento.','open.type':'Apri un file PDF o JPEG.'});
 Object.assign(I.fr,{'sig.title':'Signature','sig.hint':'Signez dans le cadre avec le doigt.','sig.clear':'Effacer','sig.skip':'Passer (nom seul)','sig.ok':'Valider'});
 Object.assign(I.en,{'sig.title':'Signature','sig.hint':'Sign in the box with your finger.','sig.clear':'Clear','sig.skip':'Skip (name only)','sig.ok':'Confirm'});
 Object.assign(I.pt,{'sig.title':'Assinatura','sig.hint':'Assine na caixa com o dedo.','sig.clear':'Limpar','sig.skip':'Saltar (só o nome)','sig.ok':'Confirmar'});
@@ -515,10 +523,11 @@ function loadSnap(sn){
 }
 
 /* ---------- export, partage ---------- */
-function makePdf(jpg,w,h){
+function makePdf(jpg,w,h,tag){
   const enc=new TextEncoder(),parts=[],off=[];let len=0;
   const push=b=>{const u=typeof b==='string'?enc.encode(b):b;parts.push(u);len+=u.length};
   push('%PDF-1.4\n');
+  if(tag)push('%POINTEO1:'+tag+'\n');
   const obj=(n,body)=>{off[n]=len;push(n+' 0 obj\n'+body+'\nendobj\n')};
   obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
   obj(2,'<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
@@ -566,6 +575,65 @@ const APPN={wa:'WhatsApp',gm:'Gmail',ol:'Outlook',ml:'E-mail',tg:'Telegram',sms:
 const cur=()=>LAST&&LAST.files[FMT];
 const subj=()=>'Feuille d’heures semaine '+LAST.week;
 const defMsg=()=>'Bonjour,\n\nVoici ma feuille d’heures de la semaine '+LAST.week+' ('+fr(LAST.start)+' – '+fr(addDays(LAST.start,6))+').\n\nCordialement'+(LAST.who?'\n'+LAST.who:'');
+
+/* ---------- données cachées dans le fichier (réouverture) ---------- */
+const b64e=u=>{let s0='';for(let i=0;i<u.length;i+=8192)s0+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s0)};
+const b64d=t0=>{const b=atob(t0),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
+const pipe=async(u,Stream,mode)=>{const st=new Blob([u]).stream().pipeThrough(new Stream(mode));return new Uint8Array(await new Response(st).arrayBuffer())};
+async function packSnap(snap){
+  const raw=new TextEncoder().encode(JSON.stringify({v:1,snap}));
+  if(typeof CompressionStream==='function'){try{return 'z'+b64e(await pipe(raw,CompressionStream,'deflate'))}catch(e){}}
+  return 'r'+b64e(raw);
+}
+async function unpackSnap(tag){
+  const f=tag[0],u=b64d(tag.slice(1));
+  let raw=u;
+  if(f==='z'){if(typeof DecompressionStream!=='function')throw new Error('nodecomp');raw=await pipe(u,DecompressionStream,'deflate')}
+  else if(f!=='r')throw new Error('badtag');
+  const o=JSON.parse(new TextDecoder().decode(raw));
+  if(!o||o.v!==1||!o.snap||typeof o.snap!=='object')throw new Error('badtag');
+  return o.snap;
+}
+function jpegWithTag(jpg,tag){
+  const parts=[],te=new TextEncoder(),N=60000;
+  for(let i=0,k=0;i<tag.length;i+=N,k++){
+    const body=te.encode('P1#'+k+'#'+tag.slice(i,i+N)),n=body.length+2,seg=new Uint8Array(4+body.length);
+    seg[0]=0xFF;seg[1]=0xFE;seg[2]=n>>8;seg[3]=n&255;seg.set(body,4);parts.push(seg);
+  }
+  let at=2;
+  if(jpg[2]===0xFF&&jpg[3]===0xE0)at=4+((jpg[4]<<8)|jpg[5]);
+  const out=[jpg.subarray(0,at),...parts,jpg.subarray(at)],len=out.reduce((a,b)=>a+b.length,0),res=new Uint8Array(len);
+  let p=0;out.forEach(b=>{res.set(b,p);p+=b.length});return res;
+}
+function readTag(u){
+  if(u.length>4&&u[0]===0x25&&u[1]===0x50&&u[2]===0x44&&u[3]===0x46){
+    const s0=new TextDecoder('latin1').decode(u),i=s0.indexOf('%POINTEO1:');if(i<0)return null;
+    const j=s0.indexOf('\n',i);return s0.slice(i+10,j<0?undefined:j).trim()||null;
+  }
+  if(u[0]===0xFF&&u[1]===0xD8){
+    const got=[];let i=2;
+    while(i+4<u.length&&u[i]===0xFF){
+      const m=u[i+1];if(m===0xDA||m===0xD9)break;
+      if(m===0x01||(m>=0xD0&&m<=0xD7)){i+=2;continue}
+      const n=(u[i+2]<<8)|u[i+3];
+      if(m===0xFE){const t0=new TextDecoder('latin1').decode(u.subarray(i+4,i+2+n)),r=/^P1#(\d+)#/.exec(t0);if(r)got[+r[1]]=t0.slice(r[0].length)}
+      i+=2+n;
+    }
+    return got.length&&got.every(x=>x!==undefined)?got.join(''):null;
+  }
+  return undefined;
+}
+async function openSheetFile(file){
+  const m=$('#opmsg');m.textContent='';
+  try{
+    const u=new Uint8Array(await file.arrayBuffer()),tag=readTag(u);
+    if(tag===undefined){m.textContent=t('open.type');return}
+    if(!tag){m.textContent=t('open.none');return}
+    const snap=await unpackSnap(tag);
+    if(!snap.agency||!agOf(snap.agency)||!Array.isArray(snap.rows)||snap.rows.length!==7||!snap.start){m.textContent=t('open.none');return}
+    loadSnap(snap);fillInputs();setST('semaine');update();save();go('feuille');
+  }catch(e){m.textContent=t('open.none')}
+}
 async function exportFile(o){
   o=o||{};
   try{
@@ -575,11 +643,13 @@ async function exportFile(o){
     const tot=draw();
     const jpg=await new Promise(r=>cv.toBlob(r,'image/jpeg',0.93));
     const base='feuille-heures-'+S.start;
-    const pdf=makePdf(new Uint8Array(await jpg.arrayBuffer()),1754,1240);
+    const snap0=JSON.parse(JSON.stringify(S));delete snap0.wk;
+    const tag=await packSnap(snap0),jbytes=new Uint8Array(await jpg.arrayBuffer());
+    const pdf=makePdf(jbytes,1754,1240,tag),jtag=jpegWithTag(jbytes,tag);
     if(LAST&&LAST.prev)URL.revokeObjectURL(LAST.prev);
-    LAST={files:{pdf:new File([pdf],base+'.pdf',{type:'application/pdf'}),jpg:new File([jpg],base+'.jpg',{type:'image/jpeg'})},prev:URL.createObjectURL(jpg),week:isoWeek(S.start),start:S.start,tot,who:S.name,agency:S.agency};
+    LAST={files:{pdf:new File([pdf],base+'.pdf',{type:'application/pdf'}),jpg:new File([jtag],base+'.jpg',{type:'image/jpeg'})},prev:URL.createObjectURL(jpg),week:isoWeek(S.start),start:S.start,tot,who:S.name,agency:S.agency};
     DONE=new Set();
-    if(!o.noHist){const snap=JSON.parse(JSON.stringify(S));delete snap.wk;H.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),at:Date.now(),tot,snap});saveH()}
+    if(!o.noHist){const snap=snap0;H.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),at:Date.now(),tot,snap});saveH()}
     shmsg('');renderShare();renderHistory();go('partage');
   }catch(e){say(t('fail'))}
 }
@@ -671,6 +741,10 @@ function applyLang(){
 }
 const syncLang=()=>document.querySelectorAll('#lang button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===LANG)));
 $('#lang').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;LANG=b.dataset.lang;try{localStorage.setItem('fh-lang',LANG)}catch(x){}syncLang();applyLang()});
+
+window.openSheetB64=(b64,name)=>{go('accueil');return openSheetFile(new File([b64d(b64)],name||'file'))};
+$('#opbtn').addEventListener('click',()=>$('#opfile').click());
+$('#opfile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)openSheetFile(f)});
 
 /* ---------- profil (première ouverture) ---------- */
 let P={};try{P=JSON.parse(localStorage.getItem('fh-profile')||'{}')||{}}catch(e){}

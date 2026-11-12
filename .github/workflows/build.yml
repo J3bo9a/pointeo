@@ -1,6 +1,7 @@
 name: Build APK
 on:
   push:
+    branches-ignore: [gh-pages]
   workflow_dispatch:
 permissions:
   contents: write

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "agencies": [
+    {
+      "id": "alterna-emploi",
+      "name": "Alterna Emploi",
+      "city": "Bulle",
+      "fax": "+41 21 555 31 49",
+      "logo": "logos/alterna-emploi.svg",
+      "lv": "1"
+    },
+    {
+      "id": "atlas-travail-temporaire",
+      "name": "Atlas Travail Temporaire",
+      "city": "Fribourg",
+      "fax": "+41 21 555 38 62",
+      "logo": "logos/atlas-travail-temporaire.svg",
+      "lv": "1"
+    },
+    {
+      "id": "brigade-interim",
+      "name": "Brigade Intérim",
+      "city": "Yverdon-les-Bains",
+      "fax": "+41 21 555 45 75",
+      "logo": "logos/brigade-interim.svg",
+      "lv": "1"
+    }
+  ]
+}

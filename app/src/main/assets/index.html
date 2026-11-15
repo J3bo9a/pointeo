@@ -22,6 +22,8 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:2rem}
 body.s{padding-bottom:7.5rem}
+body.s .tabs{display:none}
+.opn{margin-top:1.2rem}
 .wrap{max-width:480px;margin:0 auto;padding:1rem 1rem}
 .top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.4rem .8rem;margin-bottom:1.6rem}
 .brand{display:inline-flex;align-items:center;gap:.55rem;font:inherit;font-weight:700;font-size:1.25rem;background:none;border:0;color:var(--ink);padding:.4rem 0;cursor:pointer}
@@ -56,8 +58,12 @@ input{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1px s
 .row,.head{display:grid;grid-template-columns:4.4rem 1fr 5rem 2.75rem;gap:.4rem;align-items:center}
 .head{font-size:.8rem;color:var(--mu);margin:.9rem 0 .2rem}
 .day{margin:.3rem 0}
+.chips{display:flex;gap:.4rem;margin:.3rem 0 .2rem 4.8rem}.chips[hidden]{display:none}
+.chips button{font:inherit;font-size:.9rem;min-width:3rem;min-height:2.4rem;padding:0 .7rem;border:1px solid var(--ln);border-radius:99px;background:var(--in);color:var(--ink);cursor:pointer}
+.day.today .d{font-weight:700}.day.today .d::after{content:'';display:inline-block;width:.4rem;height:.4rem;border-radius:50%;background:var(--ink);margin-left:.3rem;vertical-align:middle}
+#today{display:block;margin:-.6rem auto .6rem}
 .d{font-size:.95rem}
-.more{font:inherit;font-size:1.2rem;line-height:1;color:var(--mu);background:transparent;border:1px solid var(--ln);border-radius:10px;min-height:2.75rem;cursor:pointer}
+.more{font:inherit;font-size:.9rem;padding:0 .4rem;line-height:1;color:var(--mu);background:transparent;border:1px solid var(--ln);border-radius:10px;min-height:2.75rem;cursor:pointer}
 .more.on{color:var(--ink);border-color:var(--ink)}
 .extra{padding:.1rem 0 .8rem}
 .pills{display:flex;margin-top:.8rem}
@@ -137,6 +143,13 @@ input[aria-invalid="true"]{border-color:#e5484d}
 .tile.done .ok{display:flex}
 .tile:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:12px}
 textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1px solid var(--ln);border-radius:10px;padding:.6rem .75rem;resize:vertical}
+#vw{position:fixed;inset:0;z-index:950;background:#000;overflow:hidden;touch-action:none;user-select:none}
+#vwst{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+#vwimg{display:block;background:#fff;max-width:none;pointer-events:none}
+#vwx{position:absolute;top:max(.7rem,env(safe-area-inset-top,0px));right:.8rem;width:2.8rem;height:2.8rem;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#000;font-size:1.6rem;line-height:1;cursor:pointer;z-index:2}
+#vwh{position:absolute;left:0;right:0;bottom:max(.8rem,env(safe-area-inset-bottom,0px));text-align:center;color:#fff!important;pointer-events:none;transition:opacity .6s}
+.thumb{position:relative;flex:none;padding:0;border:0;background:none;cursor:zoom-in;line-height:0}
+.thumb svg{position:absolute;right:6px;bottom:6px;padding:4px;box-sizing:content-box;border-radius:50%;background:rgba(0,0,0,.65);color:#fff}
 #zoom{position:fixed;inset:0;z-index:900;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #zoom img{display:block;background:#fff;transform-origin:center center}
 #sigv{position:fixed;inset:0;z-index:950;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding:max(1rem,env(safe-area-inset-top)) 1rem max(1rem,env(safe-area-inset-bottom));gap:.8rem;overflow:auto}
@@ -172,34 +185,23 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
 
   <main id="v-accueil">
     <h1 data-i18n="home.title"></h1>
-    <p class="mu" style="margin:0 0 1rem" data-i18n="home.sub"></p>
     <input type="search" id="q" data-i18n-ph="home.search" data-i18n-al="home.search" autocomplete="off">
-    <div class="opn"><button type="button" class="b" id="opbtn" data-i18n="open.btn"></button><input type="file" id="opfile" accept="application/pdf,image/jpeg,.pdf,.jpg,.jpeg" hidden><span class="mu small" id="opmsg" role="status"></span></div>
+    <button type="button" class="b wide" id="resume" hidden style="margin-top:.8rem"></button>
     <div class="seg" id="hf" role="group" style="margin-top:.7rem"><button type="button" data-hf="all" data-i18n="home.all"></button><button type="button" data-hf="saved" data-i18n="home.saved"></button></div>
-    <div class="cnt" id="cnt"></div>
+    <div class="cnt" id="cnt" hidden></div>
     <div class="cards" id="list"></div>
     <p class="mu" id="nores" hidden></p>
+    <div class="opn"><button type="button" class="sm" id="opbtn" data-i18n="open.btn"></button><input type="file" id="opfile" accept="application/pdf,image/jpeg,.pdf,.jpg,.jpeg" hidden><span class="mu small" id="opmsg" role="status"></span></div>
   </main>
 
   <main id="v-feuille" hidden>
-    <div class="ag"><span class="lg"><img id="agimg" alt=""></span><div><b id="agnm"></b><br><button class="sm" type="button" data-go="accueil" data-i18n="sheet.change"></button></div></div>
+    <div class="ag"><span class="lg"><img id="agimg" alt=""></span><div><b id="agnm"></b><br><button class="sm" type="button" data-go="accueil" data-i18n="sheet.change"></button></div><button class="b" type="button" id="pv" style="margin-left:auto" data-i18n="st.prev"></button></div>
     <div class="seg stabs" id="st" role="tablist">
-      <button type="button" role="tab" data-st="infos" aria-selected="true" data-i18n="st.infos"></button>
       <button type="button" role="tab" data-st="semaine" aria-selected="false" data-i18n="sec.week"></button>
-      <button type="button" role="tab" data-st="apercu" aria-selected="false" data-i18n="st.prev"></button>
+      <button type="button" role="tab" data-st="infos" aria-selected="true" data-i18n="st.infos"></button>
     </div>
     <div id="p-infos">
-      <section>
-        <h2 data-i18n="sec.worker"></h2>
-        <span class="sglab" id="civ-l" style="margin-top:0" data-i18n="f.civ"></span>
-        <div class="seg" id="civ" role="group" aria-labelledby="civ-l"><button type="button" data-v="Monsieur" data-i18n="civ.mr"></button><button type="button" data-v="Madame" data-i18n="civ.mrs"></button></div>
-        <label for="name" data-i18n="f.name"></label><input id="name" maxlength="60" autocomplete="name">
-        <label for="addr1" data-i18n="f.addr"></label><input id="addr1" maxlength="60" autocomplete="off">
-        <label for="addr2" data-i18n="f.zip"></label><input id="addr2" maxlength="60" autocomplete="off">
-        <label for="phone" data-i18n="f.phone"></label><input id="phone" type="tel" inputmode="tel" maxlength="30" autocomplete="tel">
-        <label for="advisor" data-i18n="f.advisor"></label><input id="advisor" maxlength="60" autocomplete="off">
-        <label for="advphone" data-i18n="f.advphone"></label><input id="advphone" type="tel" inputmode="tel" maxlength="30" autocomplete="off">
-      </section>
+      <ul class="list" style="margin-bottom:1.4rem"><li><button class="rb" type="button" id="wkrow"><span><span class="mu small" data-i18n="sec.worker"></span><br><b id="wkname"></b></span><span class="chev" aria-hidden="true">›</span></button></li></ul>
       <section>
         <h2 data-i18n="sec.client"></h2>
         <label for="cli" style="margin-top:0" data-i18n="f.cli"></label><input id="cli" maxlength="60" autocomplete="off">
@@ -208,14 +210,17 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
         <label for="contact" data-i18n="f.contact"></label><input id="contact" maxlength="60" autocomplete="off">
         <label for="ctel" data-i18n="f.ctel"></label><input id="ctel" type="tel" inputmode="tel" maxlength="30" autocomplete="off">
         <label for="contract" data-i18n="f.site"></label><input id="contract" maxlength="60" autocomplete="off">
+        <label for="advisor" data-i18n="f.advisor"></label><input id="advisor" maxlength="60" autocomplete="off">
+        <label for="advphone" data-i18n="f.advphone"></label><input id="advphone" type="tel" inputmode="tel" maxlength="30" autocomplete="off">
       </section>
     </div>
     <div id="p-semaine" hidden>
       <div class="wkn"><button type="button" data-wk="-1" data-i18n-al="wk.prev">‹</button><b id="wklabel"></b><button type="button" data-wk="1" data-i18n-al="wk.next">›</button></div>
+      <button class="sm" type="button" id="today" hidden data-i18n="act.today"></button>
       <div id="days"></div>
       <div class="tot"><span data-i18n="d.total"></span><span id="sum">0h</span></div>
-      <div class="acts"><button class="sm" type="button" id="fill" data-i18n="act.copy"></button></div>
-      <label for="start" data-i18n="f.start"></label><input type="date" id="start">
+      <div class="acts"><button class="sm" type="button" id="we" data-i18n="act.we"></button> <button class="sm" type="button" id="cpw" data-i18n="act.prevwk" hidden></button> <button class="sm" type="button" id="fill" data-i18n="act.copy"></button></div>
+      <input type="date" id="start" hidden>
     </div>
     <div id="p-apercu" hidden>
       <button type="button" class="prevc" id="prevc" data-i18n-al="prev.hint"><canvas id="sheet" width="1754" height="1240"></canvas></button>
@@ -227,7 +232,7 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
     <h1 data-i18n="sh.title"></h1>
     <p class="mu" id="sh-empty" data-i18n="sh.empty"></p>
     <div id="sh-body" hidden>
-      <div class="shfile"><img id="sh-img" alt=""><div><b id="sh-name"></b><br><span class="mu" id="sh-meta"></span></div></div>
+      <div class="shfile"><button type="button" class="thumb" id="sh-open" data-i18n-al="vw.open"><img id="sh-img" alt=""><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21M10.5 8v5M8 10.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button><div><b id="sh-name"></b><br><span class="mu" id="sh-meta"></span></div></div>
       <span class="sglab" id="fmt-l" data-i18n="sh.format"></span>
       <div class="seg" id="fmt" role="group" aria-labelledby="fmt-l"><button type="button" data-fmt="pdf">PDF</button><button type="button" data-fmt="jpg">JPEG</button></div>
       <button type="button" class="b p wide" data-tile="all" id="shgo" style="margin-top:1.4rem" data-i18n="sh.go"></button>
@@ -266,8 +271,9 @@ textarea{width:100%;font:inherit;color:var(--ink);background:var(--in);border:1p
 <label for="obaddr" data-i18n="f.addr"></label><input id="obaddr" maxlength="60" autocomplete="street-address">
 <label for="obzip" data-i18n="f.zip"></label><input id="obzip" maxlength="60" autocomplete="off">
 <label for="obtel" data-i18n="f.phone"></label><input id="obtel" type="tel" inputmode="tel" maxlength="30" autocomplete="tel">
-<div class="row"><button type="button" class="b" id="obcancel" data-i18n="ob.cancel" hidden></button><button type="button" class="b p" id="obok" data-i18n="ob.ok" disabled></button></div></div></div>
+<div class="row"><button type="button" class="b" id="obcancel" data-i18n="ob.cancel" hidden></button><button type="button" class="b p" id="obok" data-i18n="ob.ok"></button></div></div></div>
 <div id="sigv" hidden role="dialog" aria-modal="true" aria-labelledby="sigt"><h1 id="sigt" tabindex="-1" data-i18n="sig.title"></h1><p class="mu" style="margin:0" data-i18n="sig.hint"></p><div id="sigw"><canvas id="sigpad" aria-label="Signature"></canvas></div><div class="row"><button type="button" class="b" id="sigclr" data-i18n="sig.clear"></button><button type="button" class="b p" id="sigok" data-i18n="sig.ok" disabled></button></div><button type="button" class="b" id="sigskip" data-i18n="sig.skip"></button></div>
+<div id="vw" hidden role="dialog" aria-modal="true" aria-label="Aperçu"><div id="vwst"><img id="vwimg" alt="" draggable="false"></div><button type="button" id="vwx" data-i18n-al="prev.close">×</button><div id="vwh" class="mu small" data-i18n="vw.hint"></div></div>
 <div id="zoom" hidden role="dialog" aria-modal="true"><button type="button" id="zx" data-i18n-al="prev.close">×</button><img id="zimg" alt=""></div>
 <img id="print-img" alt="">
 <script>
@@ -307,7 +313,7 @@ const norm=r=>{r=Object.assign({w:'',ot:'',ts:'',c:'',dp:'',rp:''},r);if(typeof 
   ['s','e','ps','pe','p','cp','o','dep','tr','re','fr'].forEach(k=>delete r[k]);return r};
 
 const I={
-fr:{'st.infos':'Infos','st.prev':'Aperçu','prev.hint':'Touchez la feuille pour l’agrandir.','prev.close':'Fermer','wk.prev':'Semaine précédente','wk.next':'Semaine suivante','val.hours':'Format non reconnu (ex. 8h15, max. 24 h).','exp.go':'Exporter','exp.empty':'Saisissez au moins une journée avant d’exporter.','sh.format':'Format','sh.to':'Destinataire (e-mail)','sh.msg':'Message','sh.via':'Partager via','sh.note2':'Seule « Toutes les apps » joint le fichier. Les autres applications s’ouvrent avec le message prérempli.','sh.fallback':'Le partage de fichiers n’est pas pris en charge ici. Le fichier a été enregistré à la place.','sh.opened':'Ouvert : {app}','tile.all':'Toutes les apps','tile.mail':'E-mail','tile.save':'Enregistrer','tile.print':'Imprimer','his.share':'Partager','home.all':'Toutes','home.saved':'Enregistrées','nav.agencies':'Agences','nav.settings':'Réglages','nav.share':'Partage','home.title':'Agences','home.sub':'Choisissez votre agence pour ouvrir sa feuille d’heures.','home.search':'Rechercher une agence','home.n':'{n} agences','home.r1':'1 résultat','home.rN':'{n} résultats','home.none':'Aucune agence trouvée.','save.add':'Enregistrer {name}','save.rm':'Retirer {name}','sheet.change':'Changer d’agence','sec.worker':'Collaborateur','f.civ':'Civilité','civ.mr':'Monsieur','civ.mrs':'Madame','f.empno':'N° de collaborateur','f.name':'Nom et prénom','f.addr':'Adresse','f.zip':'NPA et localité','f.advisor':'Conseiller (agence)','sec.client':'Client','f.cli':'Entreprise cliente','f.contact':'Contact (chef de chantier)','f.site':'Chantier (lieu par défaut)','sec.week':'Semaine','f.start':'Premier jour','d.hours':'Heures','d.total':'Total de la semaine','act.copy':'Copier le lundi sur lun–ven','x.ot':'Heures sup %','x.ts':'Travail sup %','x.site':'Chantier (si différent)','x.trip':'Ind. déplacement (€)','x.meal':'Panier (€)','x.more':'Plus d’options','fail':'Impossible de créer le fichier.','sh.title':'Partage','sh.empty':'Exportez une feuille pour la partager ici.','sh.shared':'Partagé.','sh.cancel':'Partage annulé.','sh.saved':'Enregistré : {f}','sh.declined':'Enregistrement annulé.','set.title':'Réglages','set.history':'Historique','set.dark':'Mode sombre','set.lang':'Langue','set.langnote':'Ne change que la langue de l’interface, pas celle de la feuille.','home.nosaved':'Aucune agence enregistrée. Appuyez sur le signet d’une agence pour l’ajouter ici.','his.empty':'Aucune feuille exportée pour l’instant. Elles apparaîtront ici après un export.','his.week':'Semaine {w}','his.exp':'Exportée le {d} en {k}','his.tot':'Total : {h}','his.open':'Ouvrir','his.del':'Supprimer'},
+fr:{'st.infos':'Infos','st.prev':'Aperçu','prev.hint':'Touchez la feuille pour l’agrandir.','prev.close':'Fermer','wk.prev':'Semaine précédente','wk.next':'Semaine suivante','val.hours':'Format non reconnu (ex. 8h15, max. 24 h).','exp.go':'Exporter','exp.empty':'Saisissez au moins une journée avant d’exporter.','sh.format':'Format','sh.to':'Destinataire (e-mail)','sh.msg':'Message','sh.via':'Partager via','sh.note2':'Seule « Toutes les apps » joint le fichier. Les autres applications s’ouvrent avec le message prérempli.','sh.fallback':'Le partage de fichiers n’est pas pris en charge ici. Le fichier a été enregistré à la place.','sh.opened':'Ouvert : {app}','tile.all':'Toutes les apps','tile.mail':'E-mail','tile.save':'Enregistrer','tile.print':'Imprimer','his.share':'Partager','home.all':'Toutes','home.saved':'Enregistrées','nav.agencies':'Agences','nav.settings':'Réglages','nav.share':'Partage','home.title':'Agences','home.sub':'Choisissez votre agence pour ouvrir sa feuille d’heures.','home.search':'Rechercher une agence','home.n':'{n} agences','home.r1':'1 résultat','home.rN':'{n} résultats','home.none':'Aucune agence trouvée.','save.add':'Enregistrer {name}','save.rm':'Retirer {name}','sheet.change':'Changer d’agence','sec.worker':'Collaborateur','f.civ':'Civilité','civ.mr':'Monsieur','civ.mrs':'Madame','f.empno':'N° de collaborateur','f.name':'Nom et prénom','f.addr':'Adresse','f.zip':'Code postal et ville','f.advisor':'Conseiller (agence)','sec.client':'Client','f.cli':'Entreprise cliente','f.contact':'Contact (chef de chantier)','f.site':'Chantier (lieu par défaut)','sec.week':'Semaine','f.start':'Premier jour','d.hours':'Heures','d.total':'Total de la semaine','act.copy':'Copier le lundi sur lun–ven','x.ot':'Heures sup %','x.ts':'Travail sup %','x.site':'Chantier (si différent)','x.trip':'Ind. déplacement (€)','x.meal':'Panier (€)','x.more':'Plus d’options','fail':'Impossible de créer le fichier.','sh.title':'Partage','sh.empty':'Exportez une feuille pour la partager ici.','sh.shared':'Partagé.','sh.cancel':'Partage annulé.','sh.saved':'Enregistré : {f}','sh.declined':'Enregistrement annulé.','set.title':'Réglages','set.history':'Historique','set.dark':'Mode sombre','set.lang':'Langue','set.langnote':'Ne change que la langue de l’interface, pas celle de la feuille.','home.nosaved':'Aucune agence enregistrée. Appuyez sur le signet d’une agence pour l’ajouter ici.','his.empty':'Aucune feuille exportée pour l’instant. Elles apparaîtront ici après un export.','his.week':'Semaine {w}','his.exp':'Exportée le {d} en {k}','his.tot':'Total : {h}','his.open':'Ouvrir','his.del':'Supprimer'},
 en:{'st.infos':'Info','st.prev':'Preview','prev.hint':'Tap the sheet to enlarge it.','prev.close':'Close','wk.prev':'Previous week','wk.next':'Next week','val.hours':'Format not recognised (e.g. 8:15, max. 24 h).','exp.go':'Export','exp.empty':'Enter at least one day before exporting.','sh.format':'Format','sh.to':'Recipient (email)','sh.msg':'Message','sh.via':'Share via','sh.note2':'Only “All apps” attaches the file. The other apps open with the message prefilled.','sh.fallback':'File sharing is not supported here. The file was saved instead.','sh.opened':'Opened: {app}','tile.all':'All apps','tile.mail':'Email','tile.save':'Save','tile.print':'Print','his.share':'Share','home.all':'All','home.saved':'Saved','nav.agencies':'Agencies','nav.settings':'Settings','nav.share':'Share','home.title':'Agencies','home.sub':'Choose your agency to open its timesheet.','home.search':'Search for an agency','home.n':'{n} agencies','home.r1':'1 result','home.rN':'{n} results','home.none':'No agency found.','save.add':'Save {name}','save.rm':'Remove {name}','sheet.change':'Change agency','sec.worker':'Employee','f.civ':'Title','civ.mr':'Mr','civ.mrs':'Ms','f.empno':'Employee no.','f.name':'Full name','f.addr':'Address','f.zip':'Postcode and city','f.advisor':'Advisor (agency)','sec.client':'Client','f.cli':'Client company','f.contact':'Contact (site manager)','f.site':'Site (default location)','sec.week':'Week','f.start':'First day','d.hours':'Hours','d.total':'Weekly total','act.copy':'Copy Monday to Mon–Fri','x.ot':'Overtime hours %','x.ts':'Extra work %','x.site':'Site (if different)','x.trip':'Travel allowance (€)','x.meal':'Meal allowance (€)','x.more':'More options','fail':'Could not create the file.','sh.title':'Share','sh.empty':'Export a timesheet to share it here.','sh.shared':'Shared.','sh.cancel':'Sharing cancelled.','sh.saved':'Saved: {f}','sh.declined':'Saving cancelled.','set.title':'Settings','set.history':'History','set.dark':'Dark mode','set.lang':'Language','set.langnote':'Only changes the language of the interface, not the timesheet.','home.nosaved':'No saved agencies yet. Tap the bookmark on an agency to add it here.','his.empty':'No timesheet exported yet. They will appear here after an export.','his.week':'Week {w}','his.exp':'Exported on {d} as {k}','his.tot':'Total: {h}','his.open':'Open','his.del':'Delete'},
 pt:{'st.infos':'Dados','st.prev':'Prévia','prev.hint':'Toque na folha para ampliar.','prev.close':'Fechar','wk.prev':'Semana anterior','wk.next':'Semana seguinte','val.hours':'Formato não reconhecido (ex. 8:15, máx. 24 h).','exp.go':'Exportar','exp.empty':'Introduza pelo menos um dia antes de exportar.','sh.format':'Formato','sh.to':'Destinatário (e-mail)','sh.msg':'Mensagem','sh.via':'Partilhar através de','sh.note2':'Só «Todas as apps» anexa o ficheiro. As outras aplicações abrem com a mensagem preenchida.','sh.fallback':'A partilha de ficheiros não é suportada aqui. O ficheiro foi guardado.','sh.opened':'Aberto: {app}','tile.all':'Todas as apps','tile.mail':'E-mail','tile.save':'Guardar','tile.print':'Imprimir','his.share':'Partilhar','home.all':'Todas','home.saved':'Guardadas','nav.agencies':'Agências','nav.settings':'Definições','nav.share':'Partilha','home.title':'Agências','home.sub':'Escolha a sua agência para abrir a respetiva folha de horas.','home.search':'Pesquisar uma agência','home.n':'{n} agências','home.r1':'1 resultado','home.rN':'{n} resultados','home.none':'Nenhuma agência encontrada.','save.add':'Guardar {name}','save.rm':'Remover {name}','sheet.change':'Mudar de agência','sec.worker':'Colaborador','f.civ':'Tratamento','civ.mr':'Senhor','civ.mrs':'Senhora','f.empno':'N.º de colaborador','f.name':'Nome completo','f.addr':'Morada','f.zip':'Código postal e localidade','f.advisor':'Consultor (agência)','sec.client':'Cliente','f.cli':'Empresa cliente','f.contact':'Contacto (chefe de obra)','f.site':'Obra (local predefinido)','sec.week':'Semana','f.start':'Primeiro dia','d.hours':'Horas','d.total':'Total da semana','act.copy':'Copiar segunda-feira para seg–sex','x.ot':'Horas extra %','x.ts':'Trabalho suplementar %','x.site':'Obra (se diferente)','x.trip':'Subsídio de deslocação (€)','x.meal':'Refeição (€)','x.more':'Mais opções','fail':'Não foi possível criar o ficheiro.','sh.title':'Partilhar','sh.empty':'Exporte uma folha para a partilhar aqui.','sh.shared':'Partilhado.','sh.cancel':'Partilha cancelada.','sh.saved':'Guardado: {f}','sh.declined':'Gravação cancelada.','set.title':'Definições','set.history':'Histórico','set.dark':'Modo escuro','set.lang':'Idioma','set.langnote':'Altera apenas o idioma da interface, não o da folha.','home.nosaved':'Ainda não há agências guardadas. Toque no marcador de uma agência para a adicionar aqui.','his.empty':'Ainda não exportou nenhuma folha. Aparecerão aqui depois de exportar.','his.week':'Semana {w}','his.exp':'Exportada a {d} em {k}','his.tot':'Total: {h}','his.open':'Abrir','his.del':'Eliminar'},
 de:{'st.infos':'Angaben','st.prev':'Vorschau','prev.hint':'Tippen Sie auf den Stundenzettel, um ihn zu vergrößern.','prev.close':'Schließen','wk.prev':'Vorherige Woche','wk.next':'Nächste Woche','val.hours':'Format nicht erkannt (z. B. 8:15, max. 24 Std.).','exp.go':'Exportieren','exp.empty':'Geben Sie vor dem Export mindestens einen Tag ein.','sh.format':'Format','sh.to':'Empfänger (E-Mail)','sh.msg':'Nachricht','sh.via':'Teilen über','sh.note2':'Nur „Alle Apps“ hängt die Datei an. Die anderen Apps öffnen sich mit der vorausgefüllten Nachricht.','sh.fallback':'Das Teilen von Dateien wird hier nicht unterstützt. Die Datei wurde stattdessen gespeichert.','sh.opened':'Geöffnet: {app}','tile.all':'Alle Apps','tile.mail':'E-Mail','tile.save':'Speichern','tile.print':'Drucken','his.share':'Teilen','home.all':'Alle','home.saved':'Gespeichert','nav.agencies':'Agenturen','nav.settings':'Einstellungen','nav.share':'Teilen','home.title':'Agenturen','home.sub':'Wählen Sie Ihre Agentur, um deren Stundenzettel zu öffnen.','home.search':'Agentur suchen','home.n':'{n} Agenturen','home.r1':'1 Ergebnis','home.rN':'{n} Ergebnisse','home.none':'Keine Agentur gefunden.','save.add':'{name} speichern','save.rm':'{name} entfernen','sheet.change':'Agentur wechseln','sec.worker':'Mitarbeiter','f.civ':'Anrede','civ.mr':'Herr','civ.mrs':'Frau','f.empno':'Mitarbeiternummer','f.name':'Vor- und Nachname','f.addr':'Adresse','f.zip':'PLZ und Ort','f.advisor':'Berater (Agentur)','sec.client':'Kunde','f.cli':'Kundenunternehmen','f.contact':'Kontakt (Bauleiter)','f.site':'Baustelle (Standardort)','sec.week':'Woche','f.start':'Erster Tag','d.hours':'Stunden','d.total':'Wochensumme','act.copy':'Montag auf Mo–Fr kopieren','x.ot':'Überstunden %','x.ts':'Zusatzarbeit %','x.site':'Baustelle (falls abweichend)','x.trip':'Fahrtentschädigung (€)','x.meal':'Verpflegung (€)','x.more':'Weitere Optionen','fail':'Die Datei konnte nicht erstellt werden.','sh.title':'Teilen','sh.empty':'Exportieren Sie einen Stundenzettel, um ihn hier zu teilen.','sh.shared':'Geteilt.','sh.cancel':'Teilen abgebrochen.','sh.saved':'Gespeichert: {f}','sh.declined':'Speichern abgebrochen.','set.title':'Einstellungen','set.history':'Verlauf','set.dark':'Dunkelmodus','set.lang':'Sprache','set.langnote':'Ändert nur die Sprache der Oberfläche, nicht die des Stundenzettels.','home.nosaved':'Noch keine gespeicherten Agenturen. Tippen Sie auf das Lesezeichen einer Agentur, um sie hier hinzuzufügen.','his.empty':'Noch kein Stundenzettel exportiert. Er erscheint hier nach dem Export.','his.week':'Woche {w}','his.exp':'Exportiert am {d} als {k}','his.tot':'Gesamt: {h}','his.open':'Öffnen','his.del':'Löschen'},
@@ -346,8 +352,8 @@ const t=(k,v)=>{let s=(I[LANG]&&I[LANG][k])||I.fr[k]||k;if(v)for(const x in v)s=
 const ld=(s,o)=>parse(s).toLocaleDateString(LOC[LANG],o);
 
 /* ---------- état de la feuille ---------- */
-const DECL_CLIENT='Par sa signature le client ou son représentant reconnaît les heures effectuées par notre collaborateur ainsi que les frais notés. Cette signature vaut d’acceptation du contrat de location de service relatif à cette mission. Le présent document signé vaut titre à la mainlevée au sens de l’art. 82 LP.';
-const DECL_WORKER='Le collaborateur confirme par sa signature sur ce rapport d’heures, que les différences par rapport au temps de travail convenu ne sont que le fait de sa volonté explicite et déclare par la présente être d’accord avec le fait, que seules lui seront payées les heures qui ont été effectuées et qui sont confirmées par la signature du client apposée sur ce rapport. Seuls les frais notés seront indemnisés.';
+const AGF=['advisor','advphone','cli','cliA','cliL','contact','ctel','contract'],WK=['name','civ','addr1','addr2','phone'];
+let AGM={};try{AGM=JSON.parse(localStorage.getItem('fh-agm')||'{}')||{}}catch(e){}
 const FIELDS=['name','civ','addr1','addr2','phone','advisor','advphone','cli','cliA','cliL','contact','ctel','contract'];
 let S={agency:'',start:monday(),rows:Array.from({length:7},()=>norm({})),wk:{}};FIELDS.forEach(k=>S[k]='');
 try{const o=JSON.parse(localStorage.getItem('feuille-heures-v2')||'null');if(o){const rows=o.rows;delete o.rows;if(o.client&&!o.contact)o.contact=o.client;delete o.client;Object.assign(S,o);if(rows&&rows.length===7)S.rows=rows.map(norm)}}catch(e){}
@@ -415,17 +421,41 @@ function draw(){
   if(nd||nr)box(fmtAmt(sd+sr),X[9]+8,889,X[10]-X[9]-16,64,{bold:true,max:36,min:18});
   c.translate(0,72);
   one('Signature client:',176,1362,500,30,LB);
-  box(DECL_CLIENT,1300,1345,943,200,{align:'left',top:true,max:28,min:12,color:LB,lh:1.25});
   c.strokeStyle=LN;c.lineWidth=2;c.setLineDash([3,7]);line(176,1545,1230,1545);c.setLineDash([]);
   if(S.sigmode==='draw'&&SIGIMG){const bw=1030,bh=150,k=Math.min(bw/SIGIMG.width,bh/SIGIMG.height),w=SIGIMG.width*k,h=SIGIMG.height*k;c.drawImage(SIGIMG,176+(bw-w)/2,1540-h,w,h)}
   else if(S.sigmode==='name'){const nm=String(S.contact||S.cli||'').trim();if(nm){let z=56;c.fillStyle=TX;c.textAlign='left';c.font='italic 400 '+z+'px '+FONT;while(z>20&&c.measureText(nm).width>1030){z-=2;c.font='italic 400 '+z+'px '+FONT}c.fillText(nm,176,1532)}}
   return tot;
 }
 
+Object.assign(I.fr,{'act.we':'Ajouter le week-end','act.prevwk':'Copier la semaine précédente','home.resume':'Reprendre'});
+Object.assign(I.en,{'act.we':'Add weekend','act.prevwk':'Copy last week','home.resume':'Resume'});
+Object.assign(I.pt,{'act.we':'Adicionar fim de semana','act.prevwk':'Copiar semana anterior','home.resume':'Continuar'});
+Object.assign(I.de,{'act.we':'Wochenende hinzufügen','act.prevwk':'Letzte Woche kopieren','home.resume':'Fortsetzen'});
+Object.assign(I.es,{'act.we':'Añadir fin de semana','act.prevwk':'Copiar semana anterior','home.resume':'Continuar'});
+Object.assign(I.it,{'act.we':'Aggiungi weekend','act.prevwk':'Copia settimana precedente','home.resume':'Riprendi'});
+Object.assign(I.fr,{'x.det':'Détails'});
+Object.assign(I.en,{'x.det':'Details'});
+Object.assign(I.pt,{'x.det':'Detalhes'});
+Object.assign(I.de,{'x.det':'Details'});
+Object.assign(I.es,{'x.det':'Detalles'});
+Object.assign(I.it,{'x.det':'Dettagli'});
+Object.assign(I.fr,{'act.today':'Aujourd’hui','exp.nocli':'Indiquez l’entreprise cliente avant d’exporter.'});
+Object.assign(I.en,{'act.today':'Today','exp.nocli':'Add the client company before exporting.'});
+Object.assign(I.pt,{'act.today':'Hoje','exp.nocli':'Indique a empresa cliente antes de exportar.'});
+Object.assign(I.de,{'act.today':'Heute','exp.nocli':'Geben Sie vor dem Export die Kundenfirma an.'});
+Object.assign(I.es,{'act.today':'Hoy','exp.nocli':'Indica la empresa cliente antes de exportar.'});
+Object.assign(I.it,{'act.today':'Oggi','exp.nocli':'Indica l’azienda cliente prima di esportare.'});
+Object.assign(I.fr,{'vw.open':'Agrandir la feuille','vw.hint':'Pincez ou double-touchez pour zoomer, glissez pour déplacer.'});
+Object.assign(I.en,{'vw.open':'Enlarge the sheet','vw.hint':'Pinch or double-tap to zoom, drag to move around.'});
+Object.assign(I.pt,{'vw.open':'Ampliar a folha','vw.hint':'Aproxime os dedos ou toque duas vezes para ampliar; arraste para mover.'});
+Object.assign(I.de,{'vw.open':'Stundenzettel vergrößern','vw.hint':'Zum Zoomen zusammenziehen oder doppeltippen, zum Bewegen ziehen.'});
+Object.assign(I.es,{'vw.open':'Ampliar la hoja','vw.hint':'Pellizca o toca dos veces para ampliar; arrastra para moverte.'});
+Object.assign(I.it,{'vw.open':'Ingrandisci il foglio','vw.hint':'Pizzica o tocca due volte per ingrandire; trascina per spostarti.'});
 /* ---------- formulaire de la semaine ---------- */
 $('#days').innerHTML=S.rows.map((r,i)=>'<div class="day" data-i="'+i+'"><div class="row"><span class="d"></span>'
  +'<input data-k="w" maxlength="10" data-i18n-al="d.hours">'
- +'<button type="button" class="more" aria-expanded="false" data-i18n-al="x.more">+</button></div>'
+ +'<button type="button" class="more" aria-expanded="false" data-i18n="x.det"></button></div>'
+ +'<div class="chips" hidden><button type="button" data-q="8h">8h</button><button type="button" data-q="7h">7h</button><button type="button" data-q="4h">4h</button><button type="button" data-q="">✕</button></div>'
  +'<p class="err" role="alert" hidden data-i18n="val.hours"></p>'
  +'<div class="extra" hidden>'
  +'<div class="two"><label><span data-i18n="x.ot"></span><input data-k="ot" maxlength="14"></label><label><span data-i18n="x.ts"></span><input data-k="ts" maxlength="14"></label></div>'
@@ -435,11 +465,11 @@ $('#days').innerHTML=S.rows.map((r,i)=>'<div class="day" data-i="'+i+'"><div cla
 const syncCiv=()=>document.querySelectorAll('#civ button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.civ)));
 function fillInputs(){
   document.querySelectorAll('#days .day').forEach((el,i)=>el.querySelectorAll('[data-k]').forEach(n=>{n.value=S.rows[i][n.dataset.k]}));
-  FIELDS.filter(k=>k!=='civ').forEach(k=>$('#'+k).value=S[k]);syncCiv();
+  FIELDS.filter(k=>!WK.includes(k)).forEach(k=>$('#'+k).value=S[k]);syncCiv();$('#wkname').textContent=S.name||'—';
   $('#start').value=S.start;
 }
 const blankWeek=()=>Array.from({length:7},()=>norm({}));
-function setWeek(ns){ns=mondayOf(ns);if(ns===S.start){$('#start').value=S.start;return}S.wk[S.start]=S.rows;S.start=ns;S.rows=(S.wk[ns]||blankWeek()).map(norm);fillInputs();update()}
+function setWeek(ns){ns=mondayOf(ns);if(ns===S.start){$('#start').value=S.start;return}WE=false;S.wk[S.start]=S.rows;S.start=ns;S.rows=(S.wk[ns]||blankWeek()).map(norm);fillInputs();update()}
 const onDay=e=>{
   const n=e.target,k=n.dataset.k;if(!k)return;
   const r=S.rows[n.closest('.day').dataset.i];
@@ -451,12 +481,22 @@ $('#days').addEventListener('input',onDay);$('#days').addEventListener('change',
 $('#days').addEventListener('click',e=>{
   const b=e.target.closest('.more');if(!b)return;
   const ex=b.closest('.day').querySelector('.extra'),open=ex.hidden;
-  ex.hidden=!open;b.setAttribute('aria-expanded',open);b.textContent=open?'–':'+';
+  ex.hidden=!open;b.setAttribute('aria-expanded',open);
 });
-FIELDS.filter(k=>k!=='civ').forEach(k=>{const el=$('#'+k),h=e=>{S[k]=e.target.value;update()};el.addEventListener('input',h);el.addEventListener('change',h)});
-$('#civ').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.civ=S.civ===b.dataset.v?'':b.dataset.v;syncCiv();update()});
+FIELDS.filter(k=>!WK.includes(k)).forEach(k=>{const el=$('#'+k),h=e=>{S[k]=e.target.value;update()};el.addEventListener('input',h);el.addEventListener('change',h)});
 $('#start').addEventListener('change',e=>{if(e.target.value)setWeek(e.target.value)});
 $('#fill').addEventListener('click',()=>{for(let i=1;i<5;i++)S.rows[i]=Object.assign({},S.rows[0],{ot:'',ts:''});fillInputs();update()});
+let WE=false;
+$('#we').addEventListener('click',()=>{WE=true;update()});
+$('#cpw').addEventListener('click',()=>{const pr=S.wk[addDays(S.start,-7)];if(!pr)return;S.rows=pr.map(r=>Object.assign({},norm(r)));fillInputs();update()});
+$('#days').addEventListener('focusin',e=>{if(e.target.dataset.k!=='w')return;document.querySelectorAll('#days .chips').forEach(c=>c.hidden=true);e.target.closest('.day').querySelector('.chips').hidden=false});
+$('#days').addEventListener('focusout',e=>{const d=e.target.closest('.day');if(!d||e.target.dataset.k!=='w')return;setTimeout(()=>{if(!d.contains(document.activeElement))d.querySelector('.chips').hidden=true},150)});
+$('#days').addEventListener('mousedown',e=>{if(e.target.closest('.chips'))e.preventDefault()});
+$('#days').addEventListener('click',e=>{const q=e.target.closest('.chips button');if(!q)return;const d=q.closest('.day'),r=S.rows[d.dataset.i],inp=d.querySelector('[data-k=w]');r.w=q.dataset.q;inp.value=r.w;update();if('vibrate' in navigator)try{navigator.vibrate(8)}catch(_){}});
+$('#today').addEventListener('click',()=>setWeek(iso(new Date())));
+let swx=0,swy=0;const pw_=$('#p-semaine');
+pw_.addEventListener('touchstart',e=>{swx=e.touches[0].clientX;swy=e.touches[0].clientY},{passive:true});
+pw_.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-swx,dy=e.changedTouches[0].clientY-swy;if(Math.abs(dx)>70&&Math.abs(dy)<40)setWeek(addDays(S.start,dx<0?7:-7))},{passive:true});
 const sumMins=()=>S.rows.reduce((a,r)=>a+(mins(r)||0),0);
 function update(){
   S.sigmode='';
@@ -467,6 +507,17 @@ function update(){
     el.querySelector('[data-k=w]').setAttribute('aria-invalid',String(bad));el.querySelector('.err').hidden=!bad;
     ['dp','rp'].forEach(k=>el.querySelector('[data-k='+k+']').setAttribute('aria-invalid',String(!!String(r[k]).trim()&&parseAmt(r[k])===null)));
   });
+  const used=r=>!!(String(r.w).trim()||r.ot||r.ts||r.dp||r.rp||r.c);
+  const showWE=WE||used(S.rows[5])||used(S.rows[6]);
+  document.querySelectorAll('#days .day').forEach((el,i)=>{if(i>=5)el.hidden=!showWE});
+  $('#we').hidden=showWE;
+  const pw=S.wk[addDays(S.start,-7)];$('#cpw').hidden=!(pw&&pw.some(used));
+  const todayI=iso(new Date());document.querySelectorAll('#days .day').forEach((el,i)=>el.classList.toggle('today',addDays(S.start,i)===todayI));
+  $('#today').hidden=S.start===mondayOf(todayI);
+  {const tm=sumMins();$('#exp').textContent=t('exp.go')+(tm?' · '+fmtS(tm):'')}
+  if(S.cli&&$('#msg').textContent===t('exp.nocli'))say('');
+  $('#wkname').textContent=S.name||'—';
+  if(S.agency){AGM[S.agency]=Object.fromEntries(AGF.map(k=>[k,S[k]||'']));try{localStorage.setItem('fh-agm',JSON.stringify(AGM))}catch(e){}}
   $('#sum').textContent=fmtS(sumMins());
   const o={day:'numeric',month:'short'};$('#wklabel').textContent=t('his.week',{w:isoWeek(S.start)})+' · '+ld(S.start,o)+' – '+ld(addDays(S.start,6),o);
   $('#start').value=S.start;
@@ -483,7 +534,8 @@ function openZoom(){
   im.style.transform=L?'none':'rotate(90deg)';
   $('#zoom').hidden=false;$('#zx').focus();
 }
-$('#prevc').addEventListener('click',openZoom);
+$('#prevc').addEventListener('click',openZoom);$('#pv').addEventListener('click',openZoom);
+$('#wkrow').addEventListener('click',()=>openOb(false));
 $('#zoom').addEventListener('click',()=>{$('#zoom').hidden=true});
 addEventListener('keydown',e=>{if(e.key==='Escape')$('#zoom').hidden=true});
 
@@ -497,10 +549,12 @@ const card=a=>{const sv=SV.includes(a.id);return '<div class="card"><button type
 function renderHome(){
   const q=nz($('#q').value.trim()),l=AG.filter(a=>nz(a.name).includes(q)&&(HF==='all'||SV.includes(a.id)));
   $('#list').innerHTML=l.map(card).join('');
-  $('#cnt').textContent=(q||HF==='saved')?(l.length===1?t('home.r1'):t('home.rN',{n:l.length})):t('home.n',{n:AG.length});
+  //$('#cnt').textContent=(q||HF==='saved')?(l.length===1?t('home.r1'):t('home.rN',{n:l.length})):t('home.n',{n:AG.length});
   $('#nores').textContent=t(HF==='saved'&&!q?'home.nosaved':'home.none');$('#nores').hidden=l.length>0;
   document.querySelectorAll('#hf button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hf===HF)));
+  const ra=agOf(S.agency),rs=$('#resume');rs.hidden=!(ra&&sumMins()>0&&!q);if(!rs.hidden)rs.textContent=t('home.resume')+' · '+ra.name+' · '+t('his.week',{w:isoWeek(S.start)});
 }
+$('#resume').addEventListener('click',()=>{setST('semaine');go('feuille')});
 function toggleSave(id){const i=SV.indexOf(id);if(i<0)SV.push(id);else SV.splice(i,1);saveSV();renderHome()}
 $('#q').addEventListener('input',renderHome);
 $('#hf').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;HF=b.dataset.hf;renderHome()});
@@ -710,7 +764,7 @@ async function tileAct(id){
   }
 }
 $('#fmt').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;FMT=b.dataset.fmt;try{localStorage.setItem('fh-fmt',FMT)}catch(x){}renderShare()});
-$('#exp').addEventListener('click',()=>{say('');if(sumMins()===0){say(t('exp.empty'));return}openSig()});
+$('#exp').addEventListener('click',()=>{say('');if(sumMins()===0){say(t('exp.empty'));return}if(!String(S.cli||'').trim()){setST('infos');say(t('exp.nocli'));$('#cli').focus();return}openSig()});
 
 /* ---------- clics globaux ---------- */
 document.addEventListener('click',e=>{
@@ -718,7 +772,7 @@ document.addEventListener('click',e=>{
   const d=el.dataset;
   if(d.go)return go(d.go);
   if(d.save)return toggleSave(d.save);
-  if(d.open){S.agency=d.open;applyProfile(false);save();setST(S.cli?'semaine':'infos');update();return go('feuille')}
+  if(d.open){S.agency=d.open;const m=AGM[d.open]||{};AGF.forEach(k=>S[k]=m[k]||'');WE=false;applyProfile(true);save();setST(S.cli?'semaine':'infos');update();return go('feuille')}
   if(d.hopen){const x=H.find(h=>h.id===d.hopen);if(!x)return;loadSnap(x.snap);fillInputs();setST('semaine');update();return go('feuille')}
   if(d.hshare)return reexport(d.hshare);
   if(d.hdel){H=H.filter(h=>h.id!==d.hdel);saveH();renderHistory();return}
@@ -749,18 +803,43 @@ $('#opfile').addEventListener('change',e=>{const f=e.target.files[0];e.target.va
 /* ---------- profil (première ouverture) ---------- */
 let P={};try{P=JSON.parse(localStorage.getItem('fh-profile')||'{}')||{}}catch(e){}
 const PK=['civ','name','addr1','addr2','phone'];
-const hasP=()=>!!(P.name&&P.addr1&&P.addr2&&P.phone);
+const hasP=()=>!!(P.done||P.name||P.addr1||P.addr2||P.phone);
 function applyProfile(force){PK.forEach(k=>{if(P[k]&&(force||!S[k]))S[k]=P[k]});fillInputs();update()}
 let obCiv='';
 const obV=()=>({name:$('#obname').value.trim(),addr1:$('#obaddr').value.trim(),addr2:$('#obzip').value.trim(),phone:$('#obtel').value.trim()});
-const obCheck=()=>{const v=obV();$('#obok').disabled=!(v.name&&v.addr1&&v.addr2&&v.phone)};
+const obCheck=()=>{$('#obok').disabled=false};
 const obSync=()=>document.querySelectorAll('#obciv button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===obCiv)));
 function openOb(first){obCiv=P.civ||'';$('#obname').value=P.name||'';$('#obaddr').value=P.addr1||'';$('#obzip').value=P.addr2||'';$('#obtel').value=P.phone||'';obSync();obCheck();$('#obcancel').hidden=!!first;$('#ob').hidden=false;$('#obt').focus()}
 ['obname','obaddr','obzip','obtel'].forEach(i=>$('#'+i).addEventListener('input',obCheck));
 $('#obciv').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;obCiv=obCiv===b.dataset.v?'':b.dataset.v;obSync()});
-$('#obok').addEventListener('click',()=>{P=Object.assign({civ:obCiv},obV());try{localStorage.setItem('fh-profile',JSON.stringify(P))}catch(e){}$('#ob').hidden=true;applyProfile(true)});
+$('#obok').addEventListener('click',()=>{P=Object.assign({civ:obCiv,done:true},obV());try{localStorage.setItem('fh-profile',JSON.stringify(P))}catch(e){}$('#ob').hidden=true;applyProfile(true)});
 $('#obcancel').addEventListener('click',()=>{$('#ob').hidden=true});
 $('#profbtn').addEventListener('click',()=>openOb(false));
+
+
+/* ---------- visionneuse : zoom, déplacement, pincement ---------- */
+(()=>{
+  const vw=$('#vw'),st=$('#vwst'),im=$('#vwimg');let sc=1,tx=0,ty=0,fit=1,iw=1754,ih=1240;const pts=new Map();let lastTap=0,pd=0,pm=null;
+  const apply=()=>{st.style.transform='translate('+tx+'px,'+ty+'px) scale('+sc+')'};
+  function clamp(){const w=iw*sc,h=ih*sc,W=innerWidth,H=innerHeight;tx=w<=W?(W-w)/2:Math.min(0,Math.max(W-w,tx));ty=h<=H?(H-h)/2:Math.min(0,Math.max(H-h,ty))}
+  function zoomAt(x,y,ns){ns=Math.min(fit*8,Math.max(fit,ns));const k=ns/sc;tx=x-(x-tx)*k;ty=y-(y-ty)*k;sc=ns;clamp();apply()}
+  function reset(){fit=Math.min(innerWidth/iw,innerHeight/ih);if(innerWidth<innerHeight)fit=innerWidth/iw;sc=fit;tx=ty=0;clamp();apply()}
+  function open(){if(!LAST)return;im.onload=()=>{iw=im.naturalWidth||1754;ih=im.naturalHeight||1240;im.style.width=iw+'px';im.style.height=ih+'px';reset()};im.src=LAST.prev;vw.hidden=false;$('#vwh').style.opacity=1;setTimeout(()=>{$('#vwh').style.opacity=0},2600);if(im.complete&&im.naturalWidth)im.onload();$('#vwx').focus()}
+  const close=()=>{vw.hidden=true;im.removeAttribute('src');$('#sh-open').focus()};
+  $('#sh-open').addEventListener('click',open);$('#vwx').addEventListener('click',close);
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!vw.hidden)close()});
+  addEventListener('resize',()=>{if(!vw.hidden)reset()});
+  vw.addEventListener('pointerdown',e=>{if(e.target.id==='vwx')return;vw.setPointerCapture&&vw.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2){const [a,b]=[...pts.values()];pd=Math.hypot(a[0]-b[0],a[1]-b[1]);pm=[(a[0]+b[0])/2,(a[1]+b[1])/2]}
+    else if(pts.size===1){const n=Date.now();if(n-lastTap<300){zoomAt(e.clientX,e.clientY,sc>fit*1.3?fit:fit*2.6);lastTap=0}else lastTap=n}});
+  vw.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;const o=pts.get(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===1){tx+=e.clientX-o[0];ty+=e.clientY-o[1];clamp();apply()}
+    else if(pts.size===2){const [a,b]=[...pts.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]),m=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(pd>0)zoomAt(m[0],m[1],sc*d/pd);if(pm){tx+=m[0]-pm[0];ty+=m[1]-pm[1];clamp();apply()}pd=d;pm=m}});
+  const up=e=>{pts.delete(e.pointerId);pd=0;pm=null;if(pts.size===1){const [a]=[...pts.values()];pm=null}};
+  vw.addEventListener('pointerup',up);vw.addEventListener('pointercancel',up);
+  vw.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,sc*(e.deltaY<0?1.18:1/1.18))},{passive:false});
+  window._vw={open,close,get sc(){return sc},get fit(){return fit}};
+})();
 
 /* ---------- navigation ---------- */
 const V=['accueil','feuille','partage','reglages','historique'];
@@ -771,6 +850,7 @@ function show(v){
   $('#bar').hidden=v!=='feuille';document.body.classList.toggle('s',v==='feuille');
   if(v==='feuille'){const a=agOf(S.agency);$('#agimg').src=url(a);$('#agnm').textContent=a.name;if(ST==='apercu')draw()}
   if(v==='historique')renderHistory();
+  if(v==='accueil')renderHome();
   window.scrollTo(0,0);
   const h=document.querySelector('#v-'+v+' h1')||(v==='feuille'?$('#agnm'):null);if(h){h.tabIndex=-1;h.focus({preventScroll:true})}
 }
@@ -779,6 +859,7 @@ function go(v){if(location.hash==='#'+v)route();else location.hash=v}
 addEventListener('hashchange',route);
 
 /* ---------- démarrage ---------- */
+{const o=applyLang;applyLang=function(){o.apply(this,arguments);update()}}
 syncLang();fillInputs();syncTheme();setST(S.cli?'semaine':'infos');applyLang();route();if(!hasP())openOb(true);
 if(document.documentElement.classList.contains('splash'))setTimeout(()=>document.documentElement.classList.remove('splash'),2000);
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));

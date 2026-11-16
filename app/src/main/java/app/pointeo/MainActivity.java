@@ -3,6 +3,9 @@ package app.pointeo;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.print.PrintAttributes;
@@ -21,6 +24,15 @@ import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 import androidx.webkit.WebViewAssetLoader;
+
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -174,6 +186,44 @@ public class MainActivity extends Activity {
             }
         }
 
+
+        @JavascriptInterface
+        public void ocr(final String id, String b64) {
+            try {
+                byte[] bytes = Base64.decode(b64, Base64.DEFAULT);
+                Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                if (bm == null) { ocrDone(id, "null"); return; }
+                TextRecognizer rec = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+                rec.process(InputImage.fromBitmap(bm, 0))
+                    .addOnSuccessListener(t -> {
+                        try {
+                            JSONArray lines = new JSONArray();
+                            for (Text.TextBlock bl : t.getTextBlocks()) {
+                                for (Text.Line ln : bl.getLines()) {
+                                    JSONObject o = box(ln.getText(), ln.getBoundingBox());
+                                    if (o == null) continue;
+                                    JSONArray els = new JSONArray();
+                                    for (Text.Element e : ln.getElements()) {
+                                        JSONObject eo = box(e.getText(), e.getBoundingBox());
+                                        if (eo != null) els.put(eo);
+                                    }
+                                    o.put("e", els);
+                                    lines.put(o);
+                                }
+                            }
+                            ocrDone(id, lines.toString());
+                        } catch (Exception ex) {
+                            ocrDone(id, "null");
+                        } finally {
+                            rec.close();
+                        }
+                    })
+                    .addOnFailureListener(e -> { rec.close(); ocrDone(id, "null"); });
+            } catch (Throwable e) {
+                ocrDone(id, "null");
+            }
+        }
+
         @JavascriptInterface
         public void print() {
             runOnUiThread(() -> {
@@ -181,6 +231,23 @@ public class MainActivity extends Activity {
                 pm.print("Pointeo", web.createPrintDocumentAdapter("Pointeo"), new PrintAttributes.Builder().build());
             });
         }
+    }
+
+
+    private static JSONObject box(String text, Rect r) throws Exception {
+        if (r == null) return null;
+        JSONObject o = new JSONObject();
+        o.put("t", text);
+        o.put("x", r.left);
+        o.put("y", r.top);
+        o.put("w", r.width());
+        o.put("h", r.height());
+        return o;
+    }
+
+    private void ocrDone(final String id, final String json) {
+        runOnUiThread(() -> web.evaluateJavascript(
+            "window.__ocr&&window.__ocr('" + id.replaceAll("[^a-zA-Z0-9]", "") + "'," + json + ")", null));
     }
 
     private void toast(final String m) {

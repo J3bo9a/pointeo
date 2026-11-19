@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,9 +21,15 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.webkit.WebViewAssetLoader;
 
 import com.google.mlkit.vision.common.InputImage;
@@ -42,6 +49,7 @@ import java.io.OutputStream;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private FrameLayout root;
     private ValueCallback<Uri[]> chooser;
     private String pendingB64;
     private boolean loaded = false;
@@ -49,8 +57,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         web = new WebView(this);
-        setContentView(web);
+        root = new FrameLayout(this);
+        root.setBackgroundColor(Color.WHITE);
+        root.addView(web, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(root);
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
         final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
                 .build();
@@ -77,8 +95,18 @@ public class MainActivity extends Activity {
                 chooser = cb;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
-                i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/pdf", "image/jpeg"});
+                java.util.ArrayList<String> types = new java.util.ArrayList<>();
+                for (String a : p.getAcceptTypes()) {
+                    if (a != null && a.contains("/") && !types.contains(a)) types.add(a);
+                }
+                if (types.isEmpty()) {
+                    i.setType("*/*");
+                } else if (types.size() == 1) {
+                    i.setType(types.get(0));
+                } else {
+                    i.setType("*/*");
+                    i.putExtra(Intent.EXTRA_MIME_TYPES, types.toArray(new String[0]));
+                }
                 try {
                     startActivityForResult(Intent.createChooser(i, null), 1);
                 } catch (Exception e) {
@@ -222,6 +250,19 @@ public class MainActivity extends Activity {
             } catch (Throwable e) {
                 ocrDone(id, "null");
             }
+        }
+
+        @JavascriptInterface
+        public void theme(final boolean dark) {
+            runOnUiThread(() -> {
+                root.setBackgroundColor(dark ? Color.BLACK : Color.WHITE);
+                getWindow().setStatusBarColor(Color.TRANSPARENT);
+                getWindow().setNavigationBarColor(Color.TRANSPARENT);
+                getWindow().setNavigationBarContrastEnforced(false);
+                WindowInsetsControllerCompat c = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+                c.setAppearanceLightStatusBars(!dark);
+                c.setAppearanceLightNavigationBars(!dark);
+            });
         }
 
         @JavascriptInterface

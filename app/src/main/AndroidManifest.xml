@@ -3,7 +3,7 @@
     <application
         android:label="Pointeo"
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"

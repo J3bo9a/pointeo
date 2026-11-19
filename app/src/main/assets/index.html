@@ -858,7 +858,7 @@ document.addEventListener('click',e=>{
 const root=document.documentElement;
 try{const th=localStorage.getItem('fh-theme');if(th)root.dataset.theme=th}catch(e){}
 const theme=()=>root.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-const syncTheme=()=>{$('#dark').checked=theme()==='dark';const m=document.querySelector('meta[name=theme-color]');if(m)m.content=theme()==='dark'?'#000000':'#ffffff'};
+const syncTheme=()=>{$('#dark').checked=theme()==='dark';try{window.AndroidBridge&&window.AndroidBridge.theme&&window.AndroidBridge.theme(theme()==='dark')}catch(e){}const m=document.querySelector('meta[name=theme-color]');if(m)m.content=theme()==='dark'?'#000000':'#ffffff'};
 $('#dark').addEventListener('change',e=>{const v=e.target.checked?'dark':'light';root.dataset.theme=v;try{localStorage.setItem('fh-theme',v)}catch(x){}syncTheme()});
 function applyLang(){
   root.lang=LANG;
